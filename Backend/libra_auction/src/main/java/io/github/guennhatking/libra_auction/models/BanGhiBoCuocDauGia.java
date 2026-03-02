@@ -26,28 +26,12 @@ public class BanGhiBoCuocDauGia {
         this.lyDo = lyDo;
     }
 
-    // tạo phien dau gia
-    public PhienDauGia taoPhienDauGia(String id, TaiSan taiSan, LocalDateTime thoiGianBatDau, LocalDateTime thoiGianKetThuc, long giaKhoiDiem, long buocGiaNhoNhat) {
-        PhienDauGia phienDauGia = new PhienDauGia();
-        phienDauGia.setId(id);
-        phienDauGia.setTaiSan(taiSan);
-        phienDauGia.setThoiGianBatDau(thoiGianBatDau);
-        phienDauGia.setThoiGianKetThuc(thoiGianKetThuc);
-        phienDauGia.setGiaKhoiDiem(giaKhoiDiem);
-        phienDauGia.setBuocGiaNhoNhat(buocGiaNhoNhat);
-        return phienDauGia;
+    // tao ban ghi bo cuoc dau gia
+    public BanGhiBoCuocDauGia(NguoiDung nguoiBoCuoc, PhienDauGia phienDauGia, String lyDo) {
+        this.nguoiBoCuoc = nguoiBoCuoc;
+        this.phienDauGia = phienDauGia;
+        this.thoiGian = LocalDateTime.now();
+        this.lyDo = lyDo;
     }
-
-    //thời gian hiện tại
-    public LocalDateTime layThoiGianHienTai() {
-        return LocalDateTime.now();
-    }
-
-    //ly do bo cuoc
-    public String layLyDoBoCuoc() {
-        return this.lyDo;
-    }
-
 }
-
 

@@ -10,14 +10,13 @@ public class PhienDauGia {
     private LocalDateTime thoiGianBatDau;
     private long thoiLuong;
     private KetQuaDauGia ketQuaDauGia;
-    private ChienLuocDatGia chienLuocDatGia;
     private Enums.TrangThaiKiemDuyet trangThaiKiemDuyet; // "chưa được duyệt" | "đã duyệt"
     private List<CauHoi> danhSachCauHoi;
     private List<BanGhiPhienDauGia> lichSuDatGia;
     private List<ThongTinThamGiaDauGia> danhSachThamGia;
     private List<BanGhiBoCuocDauGia> danhSachBoCuoc;
-    private String loaiDauGia; // "đấu giá lên" | "đấu giá xuống" | "đấu giá kín" | "đấu giá ngược"
-    private String trangThaiPhien; // "chưa bắt đầu" | "đang diễn ra" | "đã kết thúc" | "bị huỷ"
+    private Enums.LoaiDauGia loaiDauGia; // "đấu giá lên" | "đấu giá xuống" | "đấu giá kín" | "đấu giá ngược"
+    private Enums.TrangThaiPhien trangThaiPhien; // "chưa bắt đầu" | "đang diễn ra" | "đã kết thúc" | "bị huỷ"
     private LocalDateTime thoiGianTao;
     private TaiSan taiSan;
     private long giaKhoiDiem;
@@ -36,8 +35,8 @@ public class PhienDauGia {
     public List<BanGhiPhienDauGia> getLichSuDatGia() { return lichSuDatGia; }
     public List<ThongTinThamGiaDauGia> getDanhSachThamGia() { return danhSachThamGia; }
     public List<BanGhiBoCuocDauGia> getDanhSachBoCuoc() { return danhSachBoCuoc; }
-    public String getLoaiDauGia() { return loaiDauGia; }
-    public String getTrangThaiPhien() { return trangThaiPhien; }
+    public Enums.LoaiDauGia getLoaiDauGia() { return loaiDauGia; }
+    public Enums.TrangThaiPhien getTrangThaiPhien() { return trangThaiPhien; }
     public LocalDateTime getThoiGianTao() { return thoiGianTao; }
     //setter
     public void setId(String id) {

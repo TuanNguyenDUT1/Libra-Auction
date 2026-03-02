@@ -13,10 +13,4 @@ public class HinhAnhTaiSan {
     public void setTaiSan(TaiSan taiSan) { this.taiSan = taiSan; }
     public void setThuTuHienThi(int thuTuHienThi) { this.thuTuHienThi = thuTuHienThi; }
     public void setHinhAnh(String hinhAnh) { this.hinhAnh = hinhAnh; }
-
-    //lấy hình ảnh của tài sản
-    public static String[] layHinhAnhCuaTaiSan(TaiSan taiSan)
-    {
-        return null;
-    }
 }

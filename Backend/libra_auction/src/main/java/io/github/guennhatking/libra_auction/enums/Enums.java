@@ -63,5 +63,16 @@ public class Enums {
         DA_DUYET,
         BI_TU_CHOI
     }
-    
+    public enum LoaiDauGia {
+        DAU_GIA_LEN,
+        DAU_GIA_XUONG,
+        DAU_GIA_KIN,
+        DAU_GIA_NGUOC
+    }
+    public enum TrangThaiPhien {
+        CHUA_BAT_DAU,
+        DANG_DIEN_RA,
+        DA_KET_THUC,
+        BI_HUY
+    }
 }
