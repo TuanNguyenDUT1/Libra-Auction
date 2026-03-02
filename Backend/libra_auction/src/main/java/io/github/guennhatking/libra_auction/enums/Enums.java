@@ -45,5 +45,34 @@ public class Enums {
         HO_TRO_KHACH_HANG,
         OTP
     }
+    
+    public enum TinhTrangCauHoi {
+        CHUA_TRA_LOI,
+        DA_TRA_LOI,
+        DA_TU_CHOI_TRA_LOI
+    }
 
+    public enum TinhTrangGiaoDich {
+        THANH_CONG,
+        THAT_BAI,
+        DANG_XU_LY
+    }
+
+    public enum TrangThaiKiemDuyet {
+        CHUA_DUYET,
+        DA_DUYET,
+        BI_TU_CHOI
+    }
+    public enum LoaiDauGia {
+        DAU_GIA_LEN,
+        DAU_GIA_XUONG,
+        DAU_GIA_KIN,
+        DAU_GIA_NGUOC
+    }
+    public enum TrangThaiPhien {
+        CHUA_BAT_DAU,
+        DANG_DIEN_RA,
+        DA_KET_THUC,
+        BI_HUY
+    }
 }
