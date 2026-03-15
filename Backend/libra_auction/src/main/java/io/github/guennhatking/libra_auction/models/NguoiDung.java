@@ -1,29 +1,51 @@
 package io.github.guennhatking.libra_auction.models;
 
-import io.github.guennhatking.libra_auction.enums.Enums;
-import jakarta.persistence.CascadeType;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.OneToMany;
-
 import java.time.LocalDateTime;
 import java.util.List;
 
+import io.github.guennhatking.libra_auction.enums.Enums;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.Inheritance;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.Transient;
+import jakarta.persistence.InheritanceType;
+
 
 @Entity
+@Inheritance(strategy = InheritanceType.JOINED)
 public class NguoiDung {
     @Id
-    protected String Id;
-    @OneToMany(cascade = CascadeType.ALL)
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String Id;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "nguoiDung")
     protected List<TaiKhoan> danhSachPhuongThucDangNhap;
+
+    @Transient
     protected TaiKhoan taiKhoanHienTai;
+
     protected String hoVaTen;
     protected String soDienThoai;
     protected String CCCD;
     protected String anhDaiDien;
+
+    @Enumerated(EnumType.STRING)
     protected Enums.TrangThaiEmail trangThaiEmail;
+
+    @Enumerated(EnumType.STRING)
     protected Enums.TrangThaiTaiKhoan trangThaiTaiKhoan;
+
     protected LocalDateTime thoiGianTao;
+
+    protected NguoiDung() {
+        // Constructor mặc định cho JPA
+    }
 
     public NguoiDung(String hoVaTen, String soDienThoai, String CCCD) {
         if (hoVaTen == null || hoVaTen.isBlank()) {
@@ -42,6 +64,14 @@ public class NguoiDung {
         this.trangThaiEmail = Enums.TrangThaiEmail.CHO_XAC_THUC;
         this.trangThaiTaiKhoan = Enums.TrangThaiTaiKhoan.CHO_XAC_NHAN;
         this.thoiGianTao = LocalDateTime.now();
+    }
+
+    public String getId() {
+        return Id;
+    }
+
+    public void setId(String id) {
+        this.Id = id;
     }
 
     public String getHoVaTen() {

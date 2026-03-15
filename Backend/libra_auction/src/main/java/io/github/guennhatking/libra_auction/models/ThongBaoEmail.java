@@ -4,6 +4,10 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class ThongBaoEmail extends ThongBao {
+    protected ThongBaoEmail() {
+        // Constructor mặc định cho JPA
+    }
+
     public ThongBaoEmail(NguoiDung nguoiNhan, String noiDung) {
         super(nguoiNhan, noiDung);
     }

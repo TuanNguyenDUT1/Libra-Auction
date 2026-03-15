@@ -5,6 +5,10 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class TaiKhoanOAuth extends TaiKhoan {
+    protected TaiKhoanOAuth() {
+        // Constructor mặc định cho JPA
+    }
+
     private String provider;    //goole, facebook, github,..
     private String providerId;
 

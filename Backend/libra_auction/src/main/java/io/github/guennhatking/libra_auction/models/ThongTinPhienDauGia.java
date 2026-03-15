@@ -1,12 +1,37 @@
 package io.github.guennhatking.libra_auction.models;
 
+import org.hibernate.annotations.ManyToAny;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.OneToOne;
+
+@Entity
 public class ThongTinPhienDauGia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id; // string(10)
+
+    @OneToOne(mappedBy = "thongTinPhienDauGia")
     private PhienDauGia phienDauGia;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tai_san_id", unique = true)
+    private TaiSan taiSan;
+
     private long tienCoc;
     private long giaKhoiDiem;
     private long khoangGia;
     private String tieuDe;
-    private TaiSan taiSan;
+
+    public ThongTinPhienDauGia() {
+        // Constructor mặc định
+    }
+
     public PhienDauGia getPhienDauGia() { return phienDauGia; }
 
     public long getTienCoc() { return tienCoc; }

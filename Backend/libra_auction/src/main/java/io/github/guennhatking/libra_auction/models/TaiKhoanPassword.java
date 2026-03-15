@@ -8,6 +8,9 @@ import java.util.regex.Pattern;
 
 @Entity
 public class TaiKhoanPassword extends TaiKhoan {
+    protected TaiKhoanPassword() {
+        // Constructor mặc định cho JPA
+    }
     private String passwordHash;
     private byte[] salt;
 
