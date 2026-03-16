@@ -2,10 +2,20 @@ package io.github.guennhatking.libra_auction.models;
 
 import io.github.guennhatking.libra_auction.enums.Enums;
 import jakarta.persistence.Entity;
+import jakarta.persistence.OneToOne;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.CascadeType;
 
 @Entity
 public class YeuCauXacThucEmail extends YeuCau {
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "yeu_cau_otp_id")
     private YeuCauOTP yeuCauOTP;
+
+    protected YeuCauXacThucEmail() {
+        // Constructor mặc định cho JPA
+    }
+
     public YeuCauXacThucEmail(NguoiDung nguoiYeuCau) {
         super(nguoiYeuCau, Enums.LoaiYeuCau.XAC_THUC_EMAIL);
     }

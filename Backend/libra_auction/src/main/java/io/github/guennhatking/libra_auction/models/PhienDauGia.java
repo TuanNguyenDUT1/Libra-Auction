@@ -1,26 +1,72 @@
 package io.github.guennhatking.libra_auction.models;
 import java.time.LocalDateTime;
 import java.util.List;
-import io.github.guennhatking.libra_auction.enums.Enums;
 
+// import org.checkerframework.checker.units.qual.g;
+
+import io.github.guennhatking.libra_auction.enums.Enums;
+import jakarta.persistence.CascadeType;
+import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
+@Entity
 public class PhienDauGia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
     private String id; // string(10)
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nguoi_tao_id")
     private NguoiDung nguoiTao;
+
+    @OneToOne(cascade = CascadeType.ALL)
+    @JoinColumn(name = "thong_tin_phien_dau_gia_id")
     private ThongTinPhienDauGia thongTinPhienDauGia;
+    
     private LocalDateTime thoiGianBatDau;
     private long thoiLuong;
+    
+    @OneToOne(cascade = CascadeType.ALL, mappedBy = "phienDauGia")
     private KetQuaDauGia ketQuaDauGia;
-    private Enums.TrangThaiKiemDuyet trangThaiKiemDuyet; // "chưa được duyệt" | "đã duyệt"
+    
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phienDauGia")
     private List<CauHoi> danhSachCauHoi;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phienDauGia")
     private List<BanGhiPhienDauGia> lichSuDatGia;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phienDauGia")
     private List<ThongTinThamGiaDauGia> danhSachThamGia;
+
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "phienDauGia")
     private List<BanGhiBoCuocDauGia> danhSachBoCuoc;
+
+    @Enumerated(EnumType.STRING)
+    private Enums.TrangThaiKiemDuyet trangThaiKiemDuyet; // "chưa được duyệt" | "đã duyệt"
+
+    @Enumerated(EnumType.STRING)
     private Enums.LoaiDauGia loaiDauGia; // "đấu giá lên" | "đấu giá xuống" | "đấu giá kín" | "đấu giá ngược"
+
+    @Enumerated(EnumType.STRING)
     private Enums.TrangThaiPhien trangThaiPhien; // "chưa bắt đầu" | "đang diễn ra" | "đã kết thúc" | "bị huỷ"
     private LocalDateTime thoiGianTao;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "tai_san_id")
     private TaiSan taiSan;
+    
     private long giaKhoiDiem;
     private long buocGiaNhoNhat;
+
+    protected PhienDauGia() {}
 
     //getter
     public String getId() { return id; }

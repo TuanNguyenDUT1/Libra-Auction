@@ -1,8 +1,23 @@
 package io.github.guennhatking.libra_auction.models;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+
+@Entity
 public class GiaoDichThanhToan extends GiaoDich {
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nguoi_gui_id")
     private NguoiDung nguoiGui;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nguoi_nhan_id")
     private NguoiDung nguoiNhan;
+
+    protected GiaoDichThanhToan() {
+        // Constructor mặc định cho JPA
+    }
 
     // Getters and setters
     public NguoiDung getNguoiGui() { return nguoiGui; }

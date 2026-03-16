@@ -1,12 +1,35 @@
 package io.github.guennhatking.libra_auction.models;
 import java.time.LocalDateTime;
 
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
+import jakarta.persistence.FetchType;
+
+@Entity
 public class BanGhiBoCuocDauGia {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "nguoi_bo_cuoc_id", referencedColumnName = "id")
     private NguoiDung nguoiBoCuoc;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "phien_dau_gia_id", referencedColumnName = "id")
     private PhienDauGia phienDauGia;
+
     private LocalDateTime thoiGian;
     private String lyDo;
 
+    protected BanGhiBoCuocDauGia() {
+        // Constructor mặc định cho JPA
+    }
+    
     public NguoiDung getNguoiBoCuoc() { return nguoiBoCuoc; }
     public PhienDauGia getPhienDauGia() { return phienDauGia; }
     public LocalDateTime getThoiGian() { return thoiGian; }
