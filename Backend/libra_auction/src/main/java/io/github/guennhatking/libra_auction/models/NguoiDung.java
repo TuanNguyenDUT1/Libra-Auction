@@ -25,7 +25,7 @@ public class NguoiDung {
     private String Id;
 
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nguoiDung")
-    protected List<TaiKhoan> danhSachPhuongThucDangNhap;
+    protected List<TaiKhoan> taiKhoanLienKet;
 
     @Transient
     protected TaiKhoan taiKhoanHienTai;
@@ -140,7 +140,7 @@ public class NguoiDung {
 
     // cập nhật mật khẩu mới cho người dùng
     public void capNhatMatKhau(String matKhauMoiHash, byte[] salt) {
-        for (TaiKhoan taiKhoan : danhSachPhuongThucDangNhap) {
+        for (TaiKhoan taiKhoan : taiKhoanLienKet) {
             if (taiKhoan instanceof TaiKhoanPassword taiKhoanPassword) {
                 taiKhoanPassword.doiMatKhau(matKhauMoiHash, salt);
                 return;
