@@ -9,6 +9,7 @@ export function FetchLiveAuctions(): LiveAuctionCardType[] {
       current_bid: 1182082000,
       bids: 18,
       time_left: 1000000,
+      href: "auctions/002/001"
     },
     {
       id: "002",
@@ -17,6 +18,7 @@ export function FetchLiveAuctions(): LiveAuctionCardType[] {
       current_bid: 141050000,
       bids: 27,
       time_left: 8400000,
+      href: "auctions/003/002"
     },
     {
       id: "003",
@@ -25,6 +27,7 @@ export function FetchLiveAuctions(): LiveAuctionCardType[] {
       current_bid: 1210000,
       bids: 66,
       time_left: 2000000,
+      href: "auctions/003/003"
     },
   ];
 }

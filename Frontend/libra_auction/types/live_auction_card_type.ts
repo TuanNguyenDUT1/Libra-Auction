@@ -5,4 +5,5 @@ export type LiveAuctionCardType = {
     current_bid: number,
     bids: number,
     time_left: number, // miliseconds left
+    href: string
 }

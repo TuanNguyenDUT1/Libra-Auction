@@ -9,6 +9,7 @@ export function FetchNewListings(): NewListingsCardType[] {
       starting_bid: 1182082000,
       biders: 18,
       starting_date: new Date(2026, 12, 12),
+      href: "auctions/002/001",
     },
     {
       id: "002",
@@ -17,6 +18,7 @@ export function FetchNewListings(): NewListingsCardType[] {
       starting_bid: 141050000,
       biders: 27,
       starting_date: new Date(2026, 12, 12),
+      href: "auctions/003/002",
     },
     {
       id: "003",
@@ -25,6 +27,7 @@ export function FetchNewListings(): NewListingsCardType[] {
       starting_bid: 1210000,
       biders: 66,
       starting_date: new Date(2026, 12, 12),
+      href: "auctions/003/003",
     },
   ];
 }
