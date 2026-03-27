@@ -3,8 +3,6 @@ package io.github.guennhatking.libra_auction.exception;
 import java.util.Map;
 import java.util.Objects;
 
-import jakarta.validation.ConstraintViolation;
-
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -24,23 +22,20 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(value = Exception.class)
     ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
         log.error("Exception: ", exception);
-        ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(ErrorCode.UNCATEGORIZED_EXCEPTION.getCode());
-        apiResponse.setMessage(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
+                .build());
     }
 
     @ExceptionHandler(value = AppException.class)
     ResponseEntity<ApiResponse> handlingAppException(AppException exception) {
         ErrorCode errorCode = exception.getErrorCode();
-        ApiResponse apiResponse = new ApiResponse();
 
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(errorCode.getMessage());
-
-        return ResponseEntity.status(errorCode.getStatusCode()).body(apiResponse);
+        return ResponseEntity.status(errorCode.getStatusCode())
+                .body(ApiResponse.builder()
+                        .message(errorCode.getMessage())
+                        .build());
     }
 
     @ExceptionHandler(value = AccessDeniedException.class)
@@ -49,7 +44,6 @@ public class GlobalExceptionHandler {
 
         return ResponseEntity.status(errorCode.getStatusCode())
                 .body(ApiResponse.builder()
-                        .code(errorCode.getCode())
                         .message(errorCode.getMessage())
                         .build());
     }
@@ -66,26 +60,26 @@ public class GlobalExceptionHandler {
             var error = exception.getBindingResult().getAllErrors().get(0);
 
             if (error instanceof org.springframework.validation.FieldError fieldError) {
-            attributes = fieldError.getArguments() != null 
-            ? Map.of(MIN_ATTRIBUTE, fieldError.getArguments()[1])
-            : null;
-}
+                attributes = fieldError.getArguments() != null
+                        ? Map.of(MIN_ATTRIBUTE, fieldError.getArguments()[1])
+                        : null;
+            }
 
-            log.info(attributes.toString());
+            if (Objects.nonNull(attributes)) {
+                log.info(attributes.toString());
+            }
 
         } catch (IllegalArgumentException e) {
-
+            log.warn("Invalid error code: {}", enumKey);
         }
 
-        ApiResponse apiResponse = new ApiResponse();
+        String message = Objects.nonNull(attributes)
+                ? mapAttribute(errorCode.getMessage(), attributes)
+                : errorCode.getMessage();
 
-        apiResponse.setCode(errorCode.getCode());
-        apiResponse.setMessage(
-                Objects.nonNull(attributes)
-                        ? mapAttribute(errorCode.getMessage(), attributes)
-                        : errorCode.getMessage());
-
-        return ResponseEntity.badRequest().body(apiResponse);
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .message(message)
+                .build());
     }
 
     private String mapAttribute(String message, Map<String, Object> attributes) {

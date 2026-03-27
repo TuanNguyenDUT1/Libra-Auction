@@ -1,16 +1,14 @@
 package io.github.guennhatking.libra_auction.service;
 
-import io.github.guennhatking.libra_auction.dto.request.IntrospectRequest;
+
 import io.github.guennhatking.libra_auction.dto.request.RefreshRequest;
 import io.github.guennhatking.libra_auction.dto.request.SignupRequest;
 import io.github.guennhatking.libra_auction.dto.response.AuthenticationResponse;
-import io.github.guennhatking.libra_auction.dto.response.IntrospectResponse;
 import io.github.guennhatking.libra_auction.dto.response.UserResponse;
 import io.github.guennhatking.libra_auction.exception.AppException;
 import io.github.guennhatking.libra_auction.exception.ErrorCode;
 import io.github.guennhatking.libra_auction.models.NguoiDung;
 import io.github.guennhatking.libra_auction.models.TaiKhoanPassword;
-import io.github.guennhatking.libra_auction.repos.InvalidatedTokenRepository;
 import io.github.guennhatking.libra_auction.repos.NguoiDungRepository;
 import io.github.guennhatking.libra_auction.repos.TaiKhoanRepository;
 import io.github.guennhatking.libra_auction.repos.TaiKhoanPasswordRepository;
@@ -27,7 +25,6 @@ import com.nimbusds.jose.crypto.MACVerifier;
 import com.nimbusds.jwt.JWTClaimsSet;
 import com.nimbusds.jwt.SignedJWT;
 import com.nimbusds.oauth2.sdk.ParseException;
-import com.nimbusds.oauth2.sdk.util.CollectionUtils;
 
 import lombok.extern.slf4j.Slf4j;
 
@@ -55,8 +52,6 @@ public class AuthenticationService {
     @Autowired
     private TaiKhoanPasswordRepository taiKhoanPasswordRepository;
     
-    @Autowired
-    private InvalidatedTokenRepository invalidatedTokenRepository;
 
     @Value("${jwt.signerKey}")
     private String SIGNER_KEY;
@@ -68,43 +63,48 @@ public class AuthenticationService {
     private long REFRESHABLE_DURATION;
 
     
-    private SignedJWT verifyToken(String token, boolean isRefresh) throws JOSEException, ParseException, java.text.ParseException {
+    private SignedJWT verifyAccessToken(String token) throws JOSEException, ParseException, java.text.ParseException {
         JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
 
         SignedJWT signedJWT = SignedJWT.parse(token);
 
-        Date expiryTime = (isRefresh)
-                ? new Date(signedJWT
-                        .getJWTClaimsSet()
-                        .getIssueTime()
-                        .toInstant()
-                        .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
-                        .toEpochMilli())
-                : signedJWT.getJWTClaimsSet().getExpirationTime();
+        Date expiryTime = signedJWT.getJWTClaimsSet().getExpirationTime();
 
         var verified = signedJWT.verify(verifier);
 
         if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
 
-        if (invalidatedTokenRepository.existsById(signedJWT.getJWTClaimsSet().getJWTID()))
+        String tokenType = (String) signedJWT.getJWTClaimsSet().getClaim("type");
+        if (tokenType == null || !tokenType.equals("ACCESS")) 
+            throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        return signedJWT;
+    }
+
+    private SignedJWT verifyRefreshToken(String token) throws JOSEException, ParseException, java.text.ParseException {
+        JWSVerifier verifier = new MACVerifier(SIGNER_KEY.getBytes());
+
+        SignedJWT signedJWT = SignedJWT.parse(token);
+
+        Date expiryTime = new Date(signedJWT
+                .getJWTClaimsSet()
+                .getIssueTime()
+                .toInstant()
+                .plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS)
+                .toEpochMilli());
+
+        var verified = signedJWT.verify(verifier);
+
+        if (!(verified && expiryTime.after(new Date()))) throw new AppException(ErrorCode.UNAUTHENTICATED);
+
+        String tokenType = (String) signedJWT.getJWTClaimsSet().getClaim("type");
+        if (tokenType == null || !tokenType.equals("REFRESH")) 
             throw new AppException(ErrorCode.UNAUTHENTICATED);
 
         return signedJWT;
     }
 
 
-    public IntrospectResponse introspect(IntrospectRequest request) throws JOSEException, ParseException, java.text.ParseException {
-        var token = request.getToken();
-        boolean isValid = true;
-
-        try {
-            verifyToken(token, false);
-        } catch (AppException e) {
-            isValid = false;
-        }
-
-        return IntrospectResponse.builder().valid(isValid).build();
-    }
 
     private String buildScope(NguoiDung user) {
         StringJoiner stringJoiner = new StringJoiner(" ");
@@ -132,6 +132,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(VALID_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("type", "ACCESS")
                 .claim("scope", buildScope(user))
                 .build();
 
@@ -158,6 +159,7 @@ public class AuthenticationService {
                 .expirationTime(new Date(
                         Instant.now().plus(REFRESHABLE_DURATION, ChronoUnit.SECONDS).toEpochMilli()))
                 .jwtID(UUID.randomUUID().toString())
+                .claim("type", "REFRESH")
                 .claim("scope", buildScope(user))
                 .build();
 
@@ -211,7 +213,7 @@ public class AuthenticationService {
 
     public AuthenticationResponse refreshToken(RefreshRequest request) 
             throws JOSEException, ParseException, java.text.ParseException {
-        var signedJWT = verifyToken(request.getRefresh_token(), true);
+        var signedJWT = verifyRefreshToken(request.getRefresh_token());
         String userId = signedJWT.getJWTClaimsSet().getSubject();
         
         var user = nguoiDungRepository.findById(userId)

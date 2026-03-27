@@ -6,7 +6,6 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
-import io.github.guennhatking.libra_auction.dto.request.UserCreationRequest;
 import io.github.guennhatking.libra_auction.dto.request.UserUpdateRequest;
 import io.github.guennhatking.libra_auction.dto.response.UserResponse;
 import io.github.guennhatking.libra_auction.exception.AppException;
@@ -28,18 +27,7 @@ public class UserService {
     NguoiDungRepository nguoiDungRepository;
     UserMapper userMapper;
 
-    public UserResponse createUser(UserCreationRequest request) {
-        NguoiDung user = userMapper.toUser(request);
-
-        try {
-            user = nguoiDungRepository.save(user);
-        } catch (Exception exception) {
-            throw new AppException(ErrorCode.USER_EXISTED);
-        }
-
-        return userMapper.toUserResponse(user);
-    }
-
+    
     public UserResponse getMyInfo() {
         var context = SecurityContextHolder.getContext();
         String email = context.getAuthentication().getName();

@@ -11,11 +11,9 @@ import org.springframework.web.bind.annotation.RestController;
 
 import io.github.guennhatking.libra_auction.dto.request.ApiResponse;
 import io.github.guennhatking.libra_auction.dto.request.AuthenticationRequest;
-import io.github.guennhatking.libra_auction.dto.request.IntrospectRequest;
 import io.github.guennhatking.libra_auction.dto.request.RefreshRequest;
 import io.github.guennhatking.libra_auction.dto.request.SignupRequest;
 import io.github.guennhatking.libra_auction.dto.response.AuthenticationResponse;
-import io.github.guennhatking.libra_auction.dto.response.IntrospectResponse;
 import io.github.guennhatking.libra_auction.dto.response.UserResponse;
 import io.github.guennhatking.libra_auction.service.AuthenticationService;
 import com.nimbusds.jose.JOSEException;

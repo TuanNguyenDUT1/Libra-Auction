@@ -25,5 +25,5 @@ public class UserResponse {
 
     Enums.TrangThaiEmail trangThaiEmail;
     Enums.TrangThaiTaiKhoan trangThaiTaiKhoan;
-    Set<String> roles;
+    Set roles;
 }
