@@ -2,9 +2,12 @@ package io.github.guennhatking.libra_auction.exception;
 
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.validation.BindException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -20,9 +23,11 @@ public class GlobalExceptionHandler {
     private static final String MIN_ATTRIBUTE = "min";
 
     @ExceptionHandler(value = Exception.class)
-    ResponseEntity<ApiResponse> handlingRuntimeException(RuntimeException exception) {
-        log.error("Exception: ", exception);
-
+    ResponseEntity<ApiResponse> handlingRuntimeException(Exception exception) {
+        log.error("=== UNCAUGHT EXCEPTION ===", exception);
+        log.error("Exception Type: {}", exception.getClass().getName());
+        log.error("Exception Message: {}", exception.getMessage());
+        
         return ResponseEntity.badRequest().body(ApiResponse.builder()
                 .message(ErrorCode.UNCATEGORIZED_EXCEPTION.getMessage())
                 .build());
@@ -46,6 +51,21 @@ public class GlobalExceptionHandler {
                 .body(ApiResponse.builder()
                         .message(errorCode.getMessage())
                         .build());
+    }
+
+    @ExceptionHandler(value = BindException.class)
+    ResponseEntity<ApiResponse> handlingBindException(BindException exception) {
+        log.error("=== Form-Data Validation Error ===", exception);
+        
+        String errors = exception.getBindingResult().getAllErrors().stream()
+                .map(error -> error.getObjectName() + ": " + error.getDefaultMessage())
+                .collect(Collectors.joining(", "));
+        
+        log.error("Validation errors: {}", errors);
+        
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .message("Validation failed: " + errors)
+                .build());
     }
 
     @ExceptionHandler(value = MethodArgumentNotValidException.class)
@@ -77,6 +97,29 @@ public class GlobalExceptionHandler {
                 ? mapAttribute(errorCode.getMessage(), attributes)
                 : errorCode.getMessage();
 
+        return ResponseEntity.badRequest().body(ApiResponse.builder()
+                .message(message)
+                .build());
+    }
+
+    @ExceptionHandler(value = HttpMessageNotReadableException.class)
+    ResponseEntity<ApiResponse> handlingHttpMessageNotReadable(HttpMessageNotReadableException exception) {
+        log.error("=== JSON Parse Error ===", exception);
+        log.error("Exception Message: {}", exception.getMessage());
+        
+        String message = "Invalid JSON format";
+        Throwable cause = exception.getCause();
+        
+        // Get more detailed message if available
+        if (cause != null && cause.getMessage() != null) {
+            String causeMsg = cause.getMessage();
+            if (causeMsg.contains("Unexpected character")) {
+                message = "Invalid JSON: " + causeMsg;
+            } else {
+                message = "JSON parse error: " + causeMsg;
+            }
+        }
+        
         return ResponseEntity.badRequest().body(ApiResponse.builder()
                 .message(message)
                 .build());

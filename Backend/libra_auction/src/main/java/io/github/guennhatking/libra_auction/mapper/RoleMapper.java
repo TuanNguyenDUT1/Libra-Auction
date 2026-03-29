@@ -8,7 +8,7 @@ import io.github.guennhatking.libra_auction.dto.response.RoleResponse;
 import io.github.guennhatking.libra_auction.models.Role;
 @Mapper(componentModel = "spring")
 public interface RoleMapper {
-    @Mapping(target = "permissions", ignore = true)
+    @Mapping(target = "permissions", source = "permissions")
     Role toRole(RoleRequest request);
 
     RoleResponse toRoleResponse(Role role);
