@@ -22,7 +22,7 @@ export async function GET(request: NextRequest, { params }: {
             });
             const data = await res.json();
             if (!res.ok) {
-                return NextResponse.json({ message: "Sign in failed", error: data.error });
+                return NextResponse.redirect(failedUrl);
             }
             const jwtToken = data.token;
             const refreshToken = data.refreshToken;
