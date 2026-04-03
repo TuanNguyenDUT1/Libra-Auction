@@ -20,7 +20,7 @@ public class TaiSan {
     private DanhMuc danhMuc;
 
     private String tenTaiSan;
-    private int soLuong;
+    private Integer soLuong;
     private String moTa;
 
     // CONSTRUCTOR
