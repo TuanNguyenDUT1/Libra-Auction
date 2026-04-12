@@ -46,10 +46,10 @@ public class AuctionSessionService {
                     session.getId(),
                     product != null ? resolveProductImage(product) : null,
                     resolveAuctionTitle(session, product),
+                    categoryId,
                     session.getGiaKhoiDiem(),
                     session.getLichSuDatGia() != null ? session.getLichSuDatGia().size() : 0,
-                    calculateTimeLeft(session),
-                    "/auctions/" + categoryId + "/" + session.getId()
+                    calculateTimeLeft(session)
                 );
             })
             .toList();
@@ -142,10 +142,10 @@ public class AuctionSessionService {
             session.getId(),
             product != null ? resolveProductImage(product) : null,
             resolveAuctionTitle(session, product),
+            categoryId,
             session.getGiaKhoiDiem(),
             session.getLichSuDatGia() != null ? session.getLichSuDatGia().size() : 0,
-            calculateTimeLeft(session),
-            "/auctions/" + categoryId + "/" + session.getId()
+            calculateTimeLeft(session)
         );
     }
 

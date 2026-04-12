@@ -4,9 +4,9 @@ public record AuctionSessionResponse(
     String id,
     String image_src,
     String title,
+    String category_id,
     long current_bid,
     int bids,
-    long time_left,
-    String href
+    long time_left
 ) {
 }
