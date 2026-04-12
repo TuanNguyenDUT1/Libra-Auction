@@ -55,7 +55,8 @@ public class Enums {
     public enum TinhTrangGiaoDich {
         THANH_CONG,
         THAT_BAI,
-        DANG_XU_LY
+        DANG_XU_LY,
+        DA_HOAN_TIEN, // Dành cho GiaoDichDatCoc
     }
 
     public enum TrangThaiKiemDuyet {
