@@ -32,7 +32,8 @@ dependencies {
     implementation("com.cloudinary:cloudinary-taglib:2.0.0")
     implementation("org.mapstruct:mapstruct:${mapstruct_version}")
     annotationProcessor("org.mapstruct:mapstruct-processor:${mapstruct_version}")
-    
+    annotationProcessor("org.springframework.boot:spring-boot-configuration-processor")
+
     runtimeOnly("org.postgresql:postgresql")
 
     testImplementation("org.springframework.boot:spring-boot-starter-test")
