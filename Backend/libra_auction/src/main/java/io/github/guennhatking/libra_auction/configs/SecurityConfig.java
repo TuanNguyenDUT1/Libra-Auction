@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.configs;
 
-import io.github.guennhatking.libra_auction.security.JwtAuthFilter;
+import java.util.List;
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -16,7 +17,7 @@ import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
-import java.util.List;
+import io.github.guennhatking.libra_auction.security.JwtAuthFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -72,10 +73,13 @@ public class SecurityConfig {
                     "/api/auction-sessions/**",
                     "/api/auctions/*/bids",
                     "/api/auctions/*/bids/count"
+                    "/api/auction-registrations",
+                    "/api/auction-registrations/**"
                 ).permitAll()
                 .requestMatchers(HttpMethod.POST,
                     "/api/auction-sessions",
                     "/api/products",
+                    "/api/auction-registrations",
                     "/auth/signin",
                     "/auth/signup",
                     "/auth/google",
@@ -87,7 +91,8 @@ public class SecurityConfig {
                 ).permitAll()
                 .requestMatchers(HttpMethod.DELETE,
                     "/api/auction-sessions/**",
-                    "/api/products/**"
+                    "/api/products/**",
+                    "/api/auction-registrations/**"
                 ).permitAll()
                 .anyRequest().authenticated()
             )
