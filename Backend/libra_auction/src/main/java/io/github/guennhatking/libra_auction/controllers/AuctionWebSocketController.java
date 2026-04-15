@@ -3,6 +3,8 @@ package io.github.guennhatking.libra_auction.controllers;
 import io.github.guennhatking.libra_auction.enums.Enums;
 import io.github.guennhatking.libra_auction.models.PhienDauGia;
 import io.github.guennhatking.libra_auction.repositories.PhienDauGiaRepository;
+import io.github.guennhatking.libra_auction.services.AuctionStateRedisService;
+import io.github.guennhatking.libra_auction.services.AuctionWebSocketNotificationService;
 import io.github.guennhatking.libra_auction.viewmodels.request.BidMessage;
 import io.github.guennhatking.libra_auction.viewmodels.response.BidResponse;
 import org.springframework.messaging.handler.annotation.MessageMapping;
@@ -28,17 +30,27 @@ public class AuctionWebSocketController {
     
     private final SimpMessagingTemplate messagingTemplate;
     private final PhienDauGiaRepository phienDauGiaRepository;
+    private final AuctionStateRedisService auctionStateRedisService;
+    private final AuctionWebSocketNotificationService auctionWebSocketNotificationService;
     
     // In-memory storage for bid history per auction
     private static final Map<String, List<BidResponse>> auctionBids = new ConcurrentHashMap<>();
     
     // Current winner tracking for sealed bid auctions (revealed only at end)
     private static final Map<String, BidResponse> sealedBidWinners = new ConcurrentHashMap<>();
+    
+    // Configuration
+    private static final int FINAL_MINUTES_WINDOW = 5;
+    private static final int EXTENSION_MINUTES = 5;
 
     public AuctionWebSocketController(SimpMessagingTemplate messagingTemplate,
-                                      PhienDauGiaRepository phienDauGiaRepository) {
+                                      PhienDauGiaRepository phienDauGiaRepository,
+                                      AuctionStateRedisService auctionStateRedisService,
+                                      AuctionWebSocketNotificationService auctionWebSocketNotificationService) {
         this.messagingTemplate = messagingTemplate;
         this.phienDauGiaRepository = phienDauGiaRepository;
+        this.auctionStateRedisService = auctionStateRedisService;
+        this.auctionWebSocketNotificationService = auctionWebSocketNotificationService;
     }
 
     /**
@@ -76,6 +88,10 @@ public class AuctionWebSocketController {
                     sendErrorNotification(bidMessage.getAuctionId(), 
                         "Unknown auction type: " + auction.getLoaiDauGia());
             }
+            
+            // After processing bid, check if auction should be extended
+            // If a bid is placed within 5 minutes of end time, extend by 5 minutes
+            checkAndExtendAuctionIfNeeded(bidMessage.getAuctionId());
 
         } catch (IllegalArgumentException e) {
             sendErrorNotification(bidMessage.getAuctionId(), e.getMessage());
@@ -338,4 +354,34 @@ public class AuctionWebSocketController {
         auctionBids.remove(auctionId);
         sealedBidWinners.remove(auctionId);
     }
+    
+    /**
+     * Check if auction is within the final minutes and extend if needed
+     * If a bid is placed within FINAL_MINUTES_WINDOW (5 minutes), extend by EXTENSION_MINUTES (5 minutes)
+     * @param auctionId The auction ID
+     */
+    private void checkAndExtendAuctionIfNeeded(String auctionId) {
+        try {
+            // Check if auction is within final 5 minutes
+            if (auctionStateRedisService.isWithinFinalMinutes(auctionId, FINAL_MINUTES_WINDOW)) {
+                // Get current end time
+                Long currentEndTimeMillis = auctionStateRedisService.getAuctionEndTime(auctionId);
+                if (currentEndTimeMillis != null) {
+                    // Calculate new end time (5 minutes later)
+                    LocalDateTime currentEndTime = new java.time.Instant(java.time.Instant.ofEpochMilli(currentEndTimeMillis)).atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
+                    LocalDateTime newEndTime = currentEndTime.plusMinutes(EXTENSION_MINUTES);
+                    
+                    // Update Redis with new end time
+                    auctionStateRedisService.extendAuctionEnd(auctionId, newEndTime);
+                    
+                    // Notify all participants about the extension
+                    auctionWebSocketNotificationService.sendAuctionExtensionNotification(auctionId, newEndTime);
+                }
+            }
+        } catch (Exception e) {
+            // Log error but don't fail the bid
+            System.err.println("Error checking/extending auction: " + e.getMessage());
+        }
+    }
 }
+
