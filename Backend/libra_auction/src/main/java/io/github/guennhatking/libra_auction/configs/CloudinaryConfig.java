@@ -1,9 +1,10 @@
 package io.github.guennhatking.libra_auction.configs;
 
-import com.cloudinary.Cloudinary;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import com.cloudinary.Cloudinary;
 
 @Configuration
 public class CloudinaryConfig {

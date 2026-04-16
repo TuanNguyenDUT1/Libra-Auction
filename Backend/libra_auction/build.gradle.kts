@@ -22,12 +22,16 @@ val mapstruct_version="1.6.3"
 
 dependencies {
     implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-websocket")
     implementation("org.springframework.boot:spring-boot-starter-data-jpa")
     implementation("org.springframework.boot:spring-boot-starter-security")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-client")
     implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")
     implementation("org.springframework.boot:spring-boot-starter-validation")
     implementation("org.springframework.boot:spring-boot-starter-liquibase")
+    implementation("org.springframework.boot:spring-boot-starter-data-redis")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+    implementation("redis.clients:jedis")
     implementation("com.cloudinary:cloudinary-http5:2.0.0")
     implementation("com.cloudinary:cloudinary-taglib:2.0.0")
     implementation("org.mapstruct:mapstruct:${mapstruct_version}")
