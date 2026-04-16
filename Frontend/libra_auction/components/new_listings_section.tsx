@@ -1,8 +1,8 @@
 import { FetchNewListings } from "@/services/fetch_new_listings";
 import NewListingsCard from "./new_listings_card";
 import ShowMoreBtn from "./show_more_btn";
-export default function NewListingsSection() {
-  const cards = FetchNewListings();
+export default async function NewListingsSection() {
+  const cards = await FetchNewListings();
   return (
     <div className="py-16 bg-white">
       <div className="flex flex-col items-center gap-4">

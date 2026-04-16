@@ -5,5 +5,6 @@ export type NewListingsCardType = {
     starting_bid: number,
     biders: number,
     starting_date: Date, 
+    category_id: string,
     href: string
 }

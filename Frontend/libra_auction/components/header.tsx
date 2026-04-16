@@ -8,7 +8,7 @@ import { UserActionType } from "@/types/user_action_type";
 export default async function Header() {
   const authed = await isAuthenticated();
   const navItems: NavType[] = [
-    { value: "Home", href: "/" },
+    { value: "Categories", href: "/categories" },
     { value: "Auctions", href: "/auctions" },
     { value: "Support", href: "/support" },
     { value: "Contact", href: "/contact" },

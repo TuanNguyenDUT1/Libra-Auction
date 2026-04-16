@@ -1,8 +1,8 @@
 import { FetchLiveAuctions } from "@/services/fetch_live_auctions";
 import LiveAuctionCard from "./live_auction_card";
 import ShowMoreBtn from "./show_more_btn";
-export default function LiveAuctionsSection() {
-  const cards = FetchLiveAuctions();
+export default async function LiveAuctionsSection() {
+  const cards = await FetchLiveAuctions();
   return (
     <div className="py-16 bg-(--background-color)">
       <div className="flex flex-col items-center gap-4">

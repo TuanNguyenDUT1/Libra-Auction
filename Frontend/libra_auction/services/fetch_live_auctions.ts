@@ -1,33 +1,23 @@
 import type { LiveAuctionCardType } from "@/types/live_auction_card_type";
-export function FetchLiveAuctions(): LiveAuctionCardType[] {
-  // TODO: Fetch data from api
-  return [
-    {
-      id: "001",
-      image_src: "/live-auction-1.jpg",
-      title: "2015 TOYOTA 4RUNNER SR5/SR5 PREMIUM",
-      current_bid: 1182082000,
-      bids: 18,
-      time_left: 1000000,
-      href: "auctions/002/001"
-    },
-    {
-      id: "002",
-      image_src: "/live-auction-2.jpg",
-      title: "H14-7. Selflessness, from The Secrets, 2024",
-      current_bid: 141050000,
-      bids: 27,
-      time_left: 8400000,
-      href: "auctions/003/002"
-    },
-    {
-      id: "003",
-      image_src: "/live-auction-3.jpg",
-      title: "Star Rail Hotaru Spring Gift Ver. 1/8 Scale Complete Figure",
-      current_bid: 1210000,
-      bids: 66,
-      time_left: 2000000,
-      href: "auctions/003/003"
-    },
-  ];
+
+export async function FetchLiveAuctions(): Promise<LiveAuctionCardType[]> {
+  try {
+    const res = await fetch(process.env.BACKEND_SERVER_URL! + "/api/auction-sessions/");
+
+    if (!res.ok) {
+      return [];
+    }
+
+    const data = (await res.json()) as LiveAuctionCardType[];
+
+    for (const auction of data) {
+      auction.href = "/auctions/" + auction.category_id + "/" + auction.id;
+    }
+
+    return data;
+
+  } catch (error) {
+    console.log("FetchLiveAuctions error:", error);
+    return [];
+  }
 }
