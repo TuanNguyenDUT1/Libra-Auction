@@ -72,7 +72,7 @@ public class SecurityConfig {
                     "/api/auction-sessions",
                     "/api/auction-sessions/**",
                     "/api/auctions/*/bids",
-                    "/api/auctions/*/bids/count"
+                    "/api/auctions/*/bids/count",
                     "/api/auction-registrations",
                     "/api/auction-registrations/**"
                 ).permitAll()
