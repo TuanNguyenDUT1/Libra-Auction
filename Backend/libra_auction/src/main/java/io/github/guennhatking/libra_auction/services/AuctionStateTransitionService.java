@@ -1,7 +1,6 @@
 package io.github.guennhatking.libra_auction.services;
 
 import io.github.guennhatking.libra_auction.enums.Enums;
-import io.github.guennhatking.libra_auction.models.BanGhiPhienDauGia;
 import io.github.guennhatking.libra_auction.models.KetQuaDauGia;
 import io.github.guennhatking.libra_auction.models.PhienDauGia;
 import io.github.guennhatking.libra_auction.repositories.BanGhiPhienDauGiaRepository;
@@ -15,7 +14,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Optional;
 
 /**

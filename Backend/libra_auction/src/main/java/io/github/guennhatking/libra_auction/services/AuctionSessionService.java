@@ -11,15 +11,10 @@ import io.github.guennhatking.libra_auction.repositories.TaiSanRepository;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionSessionCreateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionSessionUpdateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.AuctionSessionResponse;
-import io.github.guennhatking.libra_auction.viewmodels.response.ProductResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.time.Duration;
-import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service

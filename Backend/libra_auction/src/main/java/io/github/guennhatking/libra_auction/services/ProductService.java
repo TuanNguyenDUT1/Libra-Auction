@@ -3,8 +3,6 @@ package io.github.guennhatking.libra_auction.services;
 import io.github.guennhatking.libra_auction.models.DanhMuc;
 import io.github.guennhatking.libra_auction.models.HinhAnhTaiSan;
 import io.github.guennhatking.libra_auction.models.TaiSan;
-import io.github.guennhatking.libra_auction.models.ThongTinPhienDauGia;
-import io.github.guennhatking.libra_auction.models.ThuocTinhTaiSan;
 import io.github.guennhatking.libra_auction.models.PhienDauGia;
 import io.github.guennhatking.libra_auction.repositories.DanhMucRepository;
 import io.github.guennhatking.libra_auction.repositories.HinhAnhTaiSanRepository;
@@ -17,7 +15,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
