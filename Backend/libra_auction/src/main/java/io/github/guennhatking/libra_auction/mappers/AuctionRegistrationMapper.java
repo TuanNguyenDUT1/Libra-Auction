@@ -13,7 +13,7 @@ public interface AuctionRegistrationMapper {
 
     @Mapping(source = "id", target = "id") 
     @Mapping(source = "nguoiThamGia.id", target = "userId")
-    @Mapping(source = "nguoiThamGia.username", target = "username") 
+    @Mapping(source = "nguoiThamGia.email", target = "email") 
     @Mapping(source = "phienDauGia.id", target = "auctionSessionId")
 
     @Mapping(source = "phienDauGia.thongTinPhienDauGia.tieuDe", target = "auctionTitle", defaultValue = "Unknown")

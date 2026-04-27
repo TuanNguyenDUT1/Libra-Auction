@@ -5,7 +5,7 @@ import java.time.LocalDateTime;
 public record AuctionRegistrationResponse(
     String id,
     String userId,
-    String username,
+    String email,
     String auctionSessionId,
     String auctionTitle,
     LocalDateTime registrationTime

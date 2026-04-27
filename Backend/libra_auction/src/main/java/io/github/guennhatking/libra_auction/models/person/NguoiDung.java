@@ -29,7 +29,6 @@ public class NguoiDung {
     @OneToMany(cascade = CascadeType.ALL, mappedBy = "nguoiDung")
     protected List<TaiKhoan> taiKhoanLienKet;
 
-    protected String username;
     protected String hoVaTen;
     protected String soDienThoai;
     protected String cccd;
@@ -60,10 +59,6 @@ public class NguoiDung {
     // GETTER
     public String getId() {
         return id;
-    }
-
-    public String getUsername() {
-        return username;
     }
 
     public List<TaiKhoan> getTaiKhoanLienKet() {
@@ -109,10 +104,6 @@ public class NguoiDung {
     // SETTER
     public void setId(String id) {
         this.id = id;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     public void setTaiKhoanLienKet(List<TaiKhoan> taiKhoanLienKet) {

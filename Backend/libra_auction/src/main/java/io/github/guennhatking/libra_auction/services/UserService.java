@@ -99,7 +99,6 @@ public class UserService {
 
         TaiKhoanOAuth oauthAccount = new TaiKhoanOAuth(
                 UUID.randomUUID().toString(),
-                email,
                 "google",
                 googleId);
         oauthAccount.setNguoiDung(savedUser);

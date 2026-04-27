@@ -5,6 +5,8 @@ import jakarta.persistence.Entity;
 
 @Entity
 public class TaiKhoanPassword extends TaiKhoan {
+    private String username;
+
     private String passwordHash;
     private byte[] salt;
 
@@ -13,12 +15,17 @@ public class TaiKhoanPassword extends TaiKhoan {
     }
 
     public TaiKhoanPassword(String id, String username, String passwordHash, byte[] salt) {
-        super(id, username, TrangThaiTaiKhoan.CHO_XAC_NHAN);
+        super(id, TrangThaiTaiKhoan.CHO_XAC_NHAN);
+        this.username = username;
         this.passwordHash = passwordHash;
         this.salt = salt;
     }
 
     // GETTER
+    public String getUsername() {
+        return username;
+    }
+
     public String getPasswordHash() {
         return passwordHash;
     }
@@ -28,6 +35,10 @@ public class TaiKhoanPassword extends TaiKhoan {
     }
 
     // SETTER
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
     public void setPasswordHash(String passwordHash) {
         this.passwordHash = passwordHash;
     }

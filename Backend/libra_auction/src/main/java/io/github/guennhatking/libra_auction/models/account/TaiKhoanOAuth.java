@@ -12,8 +12,8 @@ public class TaiKhoanOAuth extends TaiKhoan {
     protected TaiKhoanOAuth() {
     }
 
-    public TaiKhoanOAuth(String id, String username, String provider, String providerId) {
-        super(id, username, TrangThaiTaiKhoan.CHO_XAC_NHAN);
+    public TaiKhoanOAuth(String id, String provider, String providerId) {
+        super(id, TrangThaiTaiKhoan.CHO_XAC_NHAN);
         if (provider == null || provider.isBlank()) {
             throw new IllegalArgumentException("Provider không được để trống.");
         }

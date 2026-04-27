@@ -26,12 +26,9 @@ public abstract class TaiKhoan {
     protected TaiKhoan() {
     }
 
-    public TaiKhoan(String id, String username, TrangThaiTaiKhoan trangThai) {
+    public TaiKhoan(String id, TrangThaiTaiKhoan trangThai) {
         if (id == null || id.isBlank()) {
             throw new IllegalArgumentException("ID không được để trống.");
-        }
-        if (username == null || username.isBlank()) {
-            throw new IllegalArgumentException("Username không được để trống.");
         }
         this.id = id;
         this.trangThai = trangThai != null ? trangThai : TrangThaiTaiKhoan.CHO_XAC_NHAN;
