@@ -23,19 +23,12 @@ public class AuthController {
         this.authenticationService = authenticationService;
     }
 
-    /**
-     * Signup sử dụng JSON
-     */
     @PostMapping("/signup")
     public ResponseEntity<JwtResponse> signup(@Valid @RequestBody SignupRequest request) throws Exception {
-        // Vì SignupRequest giờ là Record, logic xử lý bên trong Service vẫn giữ nguyên
         JwtResponse response = authenticationService.signup(request);
         return ResponseEntity.ok(response);
     }
 
-    /**
-     * Signin sử dụng JSON
-     */
     @PostMapping("/signin")
     public ResponseEntity<JwtResponse> signin(@Valid @RequestBody SigninRequest request) throws Exception {
         JwtResponse response = authenticationService.signin(request);
@@ -51,7 +44,6 @@ public class AuthController {
     @PostMapping("/refresh")
     public ResponseEntity<TokenResponse> refreshToken(@Valid @RequestBody RefreshTokenRequest request) throws Exception {
         String newAccessToken = authenticationService.refreshToken(request);
-        // Lưu ý: Record TokenResponse cũng được khởi tạo qua constructor
         return ResponseEntity.ok(new TokenResponse(newAccessToken, System.currentTimeMillis() / 1000 + 86400));
     }
 }

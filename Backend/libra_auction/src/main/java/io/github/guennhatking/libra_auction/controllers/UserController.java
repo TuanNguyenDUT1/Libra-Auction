@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import io.github.guennhatking.libra_auction.mappers.UserMapper;
 import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 import io.github.guennhatking.libra_auction.services.UserService;
+import io.github.guennhatking.libra_auction.viewmodels.response.ServerAPIResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.UserResponse;
 
 @RestController
@@ -26,14 +27,15 @@ public class UserController {
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<UserResponse> getUserInfo(@PathVariable String id) {
+    public ServerAPIResponse<UserResponse> getUserInfo(@PathVariable String id) {
+        System.out.println("GET /api/users");
         Optional<NguoiDung> user = userService.findById(id);
-        
+
         if (user.isPresent()) {
             UserResponse userResponse = userMapper.toResponse(user.get());
-            return ResponseEntity.ok(userResponse);
+            return ServerAPIResponse.success(userResponse);
         } else {
-            return ResponseEntity.notFound().build();
+            return ServerAPIResponse.error("User ID not found");
         }
     }
 }
