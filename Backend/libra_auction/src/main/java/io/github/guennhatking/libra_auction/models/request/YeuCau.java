@@ -10,7 +10,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.ManyToOne;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import io.github.guennhatking.libra_auction.enums.request.LoaiYeuCau;
 import io.github.guennhatking.libra_auction.enums.request.TrangThaiYeuCau;
@@ -38,8 +38,8 @@ public abstract class YeuCau {
     @Enumerated(EnumType.STRING)
     protected TrangThaiYeuCau trangThaiYeuCau;
 
-    protected LocalDateTime thoiGianHetHanKichHoat;
-    protected LocalDateTime thoiGianHetHanSuDung;
+    protected OffsetDateTime thoiGianHetHanKichHoat;
+    protected OffsetDateTime thoiGianHetHanSuDung;
 
     // CONSTRUCTOR
     protected YeuCau() {
@@ -76,11 +76,11 @@ public abstract class YeuCau {
         return trangThaiYeuCau;
     }
 
-    public LocalDateTime getThoiGianHetHanKichHoat() {
+    public OffsetDateTime getThoiGianHetHanKichHoat() {
         return thoiGianHetHanKichHoat;
     }
 
-    public LocalDateTime getThoiGianHetHanSuDung() {
+    public OffsetDateTime getThoiGianHetHanSuDung() {
         return thoiGianHetHanSuDung;
     }
 
@@ -109,11 +109,11 @@ public abstract class YeuCau {
         this.trangThaiYeuCau = trangThaiYeuCau;
     }
 
-    public void setThoiGianHetHanKichHoat(LocalDateTime thoiGianHetHanKichHoat) {
+    public void setThoiGianHetHanKichHoat(OffsetDateTime thoiGianHetHanKichHoat) {
         this.thoiGianHetHanKichHoat = thoiGianHetHanKichHoat;
     }
 
-    public void setThoiGianHetHanSuDung(LocalDateTime thoiGianHetHanSuDung) {
+    public void setThoiGianHetHanSuDung(OffsetDateTime thoiGianHetHanSuDung) {
         this.thoiGianHetHanSuDung = thoiGianHetHanSuDung;
     }
 }

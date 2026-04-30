@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.models.notification;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ public abstract class ThongBao {
     protected NguoiDung nguoiNhan;
 
     protected String noiDung;
-    protected LocalDateTime thoiGianGui;
+    protected OffsetDateTime thoiGianGui;
 
     // CONSTRUCTOR
     protected ThongBao() {
@@ -31,7 +32,7 @@ public abstract class ThongBao {
     public ThongBao(NguoiDung nguoiNhan, String noiDung) {
         this.nguoiNhan = nguoiNhan;
         this.noiDung = noiDung;
-        this.thoiGianGui = LocalDateTime.now();
+        this.thoiGianGui = OffsetDateTime.now(ZoneOffset.ofHours(7));
     }
 
     // GETTER
@@ -47,7 +48,7 @@ public abstract class ThongBao {
         return noiDung;
     }
 
-    public LocalDateTime getThoiGianGui() {
+    public OffsetDateTime getThoiGianGui() {
         return thoiGianGui;
     }
 
@@ -64,7 +65,7 @@ public abstract class ThongBao {
         this.noiDung = noiDung;
     }
 
-    public void setThoiGianGui(LocalDateTime thoiGianGui) {
+    public void setThoiGianGui(OffsetDateTime thoiGianGui) {
         this.thoiGianGui = thoiGianGui;
     }
 }

@@ -8,7 +8,7 @@ import io.github.guennhatking.libra_auction.viewmodels.response.AuctionResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.PageResponse;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -104,12 +104,12 @@ public class AuctionSearchService {
         return session.getGiaKhoiDiem() == startingPrice;
     }
 
-    private boolean filterByTimeRange(PhienDauGia session, LocalDateTime timeStart, LocalDateTime timeEnd) {
+    private boolean filterByTimeRange(PhienDauGia session, OffsetDateTime timeStart, OffsetDateTime timeEnd) {
         if (timeStart == null && timeEnd == null) {
             return true;
         }
 
-        LocalDateTime sessionTime = session.getThoiGianBatDau();
+        OffsetDateTime sessionTime = session.getThoiGianBatDau();
 
         if (timeStart != null && sessionTime.isBefore(timeStart)) {
             return false;

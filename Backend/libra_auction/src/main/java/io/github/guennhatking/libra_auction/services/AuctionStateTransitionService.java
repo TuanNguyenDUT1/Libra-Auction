@@ -12,7 +12,8 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Optional;
 
 /**
@@ -120,7 +121,7 @@ public class AuctionStateTransitionService {
             // Create KetQuaDauGia (Auction Result)
             KetQuaDauGia result = new KetQuaDauGia();
             result.setPhienDauGia(auction);
-            result.setThoiGianKetThuc(LocalDateTime.now());
+            result.setThoiGianKetThuc(OffsetDateTime.now(ZoneOffset.ofHours(7)));
             
             if (latestBidResponse != null) {
                 // There is a winner - set the winner and price
@@ -170,7 +171,7 @@ public class AuctionStateTransitionService {
         try {
             messagingTemplate.convertAndSend(
                 "/topic/auction/" + auctionId + "/status",
-                "{\"auctionId\":\"" + auctionId + "\",\"status\":\"" + status + "\",\"timestamp\":\"" + LocalDateTime.now() + "\"}"
+                "{\"auctionId\":\"" + auctionId + "\",\"status\":\"" + status + "\",\"timestamp\":\"" + OffsetDateTime.now(ZoneOffset.ofHours(7)) + "\"}"
             );
         } catch (Exception e) {
             logger.error("Failed to send WebSocket notification for auction {}", auctionId, e);

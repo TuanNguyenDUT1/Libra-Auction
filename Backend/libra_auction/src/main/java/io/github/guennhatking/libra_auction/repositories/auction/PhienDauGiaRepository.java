@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.repositories.auction;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 
@@ -15,4 +16,6 @@ public interface PhienDauGiaRepository extends JpaRepository<PhienDauGia, String
     List<PhienDauGia> findByLoaiDauGia(LoaiDauGia loaiDauGia);
 
     List<PhienDauGia> findByTaiSan(TaiSan taiSan);
+
+    Optional<PhienDauGia> findByIdAndTaiSan_Category_Id(String id, String categoryId);
 }

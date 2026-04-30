@@ -1,6 +1,6 @@
 package io.github.guennhatking.libra_auction.viewmodels.response;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 
 public record AuctionResponse(
@@ -10,7 +10,7 @@ public record AuctionResponse(
         String auction_name,
         String auction_status,
         String auction_type,
-        LocalDateTime start_time,
+        OffsetDateTime start_time,
         Long duration,
 
         Long starting_price,

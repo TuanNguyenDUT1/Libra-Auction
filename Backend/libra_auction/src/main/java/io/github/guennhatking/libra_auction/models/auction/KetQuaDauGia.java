@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.models.auction;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 import jakarta.persistence.Entity;
@@ -22,7 +23,7 @@ public class KetQuaDauGia {
     @ManyToOne
     private NguoiDung nguoiThangDauGia;
 
-    private LocalDateTime thoiGianKetThuc;
+    private OffsetDateTime thoiGianKetThuc;
     private long giaTrungDauGia;
 
     // CONSTRUCTOR
@@ -33,7 +34,7 @@ public class KetQuaDauGia {
         this.phienDauGia = phienDauGia;
         this.nguoiThangDauGia = nguoiThangDauGia;
         this.giaTrungDauGia = giaTrungDauGia;
-        this.thoiGianKetThuc = LocalDateTime.now();
+        this.thoiGianKetThuc = OffsetDateTime.now(ZoneOffset.ofHours(7));
     }
 
     // GETTER
@@ -49,7 +50,7 @@ public class KetQuaDauGia {
         return nguoiThangDauGia;
     }
 
-    public LocalDateTime getThoiGianKetThuc() {
+    public OffsetDateTime getThoiGianKetThuc() {
         return thoiGianKetThuc;
     }
 
@@ -70,7 +71,7 @@ public class KetQuaDauGia {
         this.nguoiThangDauGia = nguoiThangDauGia;
     }
 
-    public void setThoiGianKetThuc(LocalDateTime thoiGianKetThuc) {
+    public void setThoiGianKetThuc(OffsetDateTime thoiGianKetThuc) {
         this.thoiGianKetThuc = thoiGianKetThuc;
     }
 

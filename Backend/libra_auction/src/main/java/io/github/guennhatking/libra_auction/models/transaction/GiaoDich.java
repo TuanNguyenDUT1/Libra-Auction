@@ -9,7 +9,8 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import io.github.guennhatking.libra_auction.enums.transaction.LoaiGiaoDich;
 import io.github.guennhatking.libra_auction.enums.transaction.TinhTrangGiaoDich;
@@ -25,7 +26,7 @@ public class GiaoDich {
     private LoaiGiaoDich loaiGiaoDich;
 
     private long soTien;
-    private LocalDateTime ngayTao;
+    private OffsetDateTime ngayTao;
 
     @Enumerated(EnumType.STRING)
     private TinhTrangGiaoDich tinhTrangGiaoDich = TinhTrangGiaoDich.DANG_XU_LY;
@@ -39,7 +40,7 @@ public class GiaoDich {
     public GiaoDich(LoaiGiaoDich loaiGiaoDich, long soTien) {
         this.loaiGiaoDich = loaiGiaoDich;
         this.soTien = soTien;
-        this.ngayTao = LocalDateTime.now();
+        this.ngayTao = OffsetDateTime.now(ZoneOffset.ofHours(7));
     }
 
     // GETTER
@@ -55,7 +56,7 @@ public class GiaoDich {
         return soTien;
     }
 
-    public LocalDateTime getNgayTao() {
+    public OffsetDateTime getNgayTao() {
         return ngayTao;
     }
 
@@ -80,7 +81,7 @@ public class GiaoDich {
         this.soTien = soTien;
     }
 
-    public void setNgayTao(LocalDateTime ngayTao) {
+    public void setNgayTao(OffsetDateTime ngayTao) {
         this.ngayTao = ngayTao;
     }
 

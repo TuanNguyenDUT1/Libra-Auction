@@ -11,7 +11,8 @@ import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Controller;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -251,7 +252,7 @@ public class AuctionWebSocketController {
                 message.bidAmount(),
                 message.bidderId(),
                 message.bidderName(),
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 status);
     }
 
@@ -289,7 +290,7 @@ public class AuctionWebSocketController {
                 bidResponse.bidAmount(),
                 bidResponse.bidderId(),
                 bidResponse.bidderName(),
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 "WINNER");
     }
 
@@ -302,7 +303,7 @@ public class AuctionWebSocketController {
                 message.bidAmount(),
                 message.bidderId(),
                 null, // bidderName không có trong BidMessage, để null hoặc giá trị mặc định
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 "CONFIRMED");
     }
 
@@ -315,7 +316,7 @@ public class AuctionWebSocketController {
                 null,
                 null,
                 null,
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 "NOTIFICATION");
     }
 
@@ -328,7 +329,7 @@ public class AuctionWebSocketController {
                 null,
                 null,
                 null,
-                LocalDateTime.now(),
+                OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 "ERROR");
         messagingTemplate.convertAndSend("/topic/auction/" + auctionId, errorResponse);
     }
@@ -370,9 +371,9 @@ public class AuctionWebSocketController {
                 Long currentEndTimeMillis = auctionStateRedisService.getAuctionEndTime(auctionId);
                 if (currentEndTimeMillis != null) {
                     // Calculate new end time (5 minutes later)
-                    LocalDateTime currentEndTime = java.time.Instant.ofEpochMilli(currentEndTimeMillis)
-                            .atZone(java.time.ZoneId.systemDefault()).toLocalDateTime();
-                    LocalDateTime newEndTime = currentEndTime.plusMinutes(EXTENSION_MINUTES);
+                    OffsetDateTime currentEndTime = java.time.Instant.ofEpochMilli(currentEndTimeMillis)
+                            .atZone(java.time.ZoneId.systemDefault()).toOffsetDateTime();
+                    OffsetDateTime newEndTime = currentEndTime.plusMinutes(EXTENSION_MINUTES);
 
                     // Update Redis with new end time
                     auctionStateRedisService.extendAuctionEnd(auctionId, newEndTime);

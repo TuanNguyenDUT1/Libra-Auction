@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.models.qa;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 
 import io.github.guennhatking.libra_auction.enums.qa.TinhTrangCauHoi;
 import io.github.guennhatking.libra_auction.models.auction.PhienDauGia;
@@ -30,8 +31,8 @@ public class CauHoi {
 
     private String noiDungHoi;
     private String noiDungTraLoi;
-    private LocalDateTime thoiGianHoi;
-    private LocalDateTime thoiGianTraLoi;
+    private OffsetDateTime thoiGianHoi;
+    private OffsetDateTime thoiGianTraLoi;
 
     @Enumerated(EnumType.STRING)
     private TinhTrangCauHoi tinhTrangCauHoi;
@@ -44,7 +45,7 @@ public class CauHoi {
         this.phienDauGia = phienDauGia;
         this.nguoiHoi = nguoiHoi;
         this.noiDungHoi = noiDungHoi;
-        this.thoiGianHoi = LocalDateTime.now();
+        this.thoiGianHoi = OffsetDateTime.now(ZoneOffset.ofHours(7));
     }
 
     // GETTER
@@ -72,11 +73,11 @@ public class CauHoi {
         return noiDungTraLoi;
     }
 
-    public LocalDateTime getThoiGianHoi() {
+    public OffsetDateTime getThoiGianHoi() {
         return thoiGianHoi;
     }
 
-    public LocalDateTime getThoiGianTraLoi() {
+    public OffsetDateTime getThoiGianTraLoi() {
         return thoiGianTraLoi;
     }
 
@@ -109,11 +110,11 @@ public class CauHoi {
         this.noiDungTraLoi = noiDungTraLoi;
     }
 
-    public void setThoiGianHoi(LocalDateTime thoiGianHoi) {
+    public void setThoiGianHoi(OffsetDateTime thoiGianHoi) {
         this.thoiGianHoi = thoiGianHoi;
     }
 
-    public void setThoiGianTraLoi(LocalDateTime thoiGianTraLoi) {
+    public void setThoiGianTraLoi(OffsetDateTime thoiGianTraLoi) {
         this.thoiGianTraLoi = thoiGianTraLoi;
     }
 

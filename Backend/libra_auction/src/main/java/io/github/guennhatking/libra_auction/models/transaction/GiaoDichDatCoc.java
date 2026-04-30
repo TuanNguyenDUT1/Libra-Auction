@@ -3,7 +3,7 @@ package io.github.guennhatking.libra_auction.models.transaction;
 import jakarta.persistence.Entity;
 import jakarta.persistence.ManyToOne;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 import io.github.guennhatking.libra_auction.enums.transaction.LoaiGiaoDich;
 import io.github.guennhatking.libra_auction.models.auction.ThongTinThamGiaDauGia;
@@ -17,7 +17,7 @@ public class GiaoDichDatCoc extends GiaoDich {
     @ManyToOne
     private ThongTinThamGiaDauGia thongTinThamGia;
 
-    private LocalDateTime thoiGianTraCoc;
+    private OffsetDateTime thoiGianTraCoc;
 
     // CONSTRUCTOR
     protected GiaoDichDatCoc() {
@@ -39,7 +39,7 @@ public class GiaoDichDatCoc extends GiaoDich {
         return thongTinThamGia;
     }
 
-    public LocalDateTime getThoiGianTraCoc() {
+    public OffsetDateTime getThoiGianTraCoc() {
         return thoiGianTraCoc;
     }
 
@@ -52,7 +52,7 @@ public class GiaoDichDatCoc extends GiaoDich {
         this.thongTinThamGia = thongTinThamGia;
     }
 
-    public void setThoiGianTraCoc(LocalDateTime thoiGianTraCoc) {
+    public void setThoiGianTraCoc(OffsetDateTime thoiGianTraCoc) {
         this.thoiGianTraCoc = thoiGianTraCoc;
     }
 }

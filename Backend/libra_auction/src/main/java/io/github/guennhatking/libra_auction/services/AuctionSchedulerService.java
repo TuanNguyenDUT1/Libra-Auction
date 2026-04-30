@@ -6,7 +6,8 @@ import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.Set;
 
 @Service
@@ -28,7 +29,7 @@ public class AuctionSchedulerService {
     @Scheduled(fixedDelay = 10000, initialDelay = 5000)
     public void checkAuctionStarting() {
         try {
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.ofHours(7));
             Set<String> auctionsToStart = auctionStateRedisService.getAuctionsToStart(now);
             
             if (!auctionsToStart.isEmpty()) {
@@ -51,7 +52,7 @@ public class AuctionSchedulerService {
     @Scheduled(fixedDelay = 10000, initialDelay = 5000)
     public void checkAuctionEnding() {
         try {
-            LocalDateTime now = LocalDateTime.now();
+            OffsetDateTime now = OffsetDateTime.now(ZoneOffset.ofHours(7));
             Set<String> auctionsToEnd = auctionStateRedisService.getAuctionsToEnd(now);
             
             if (!auctionsToEnd.isEmpty()) {

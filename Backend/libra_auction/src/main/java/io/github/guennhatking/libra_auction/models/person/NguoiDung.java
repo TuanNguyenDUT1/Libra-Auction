@@ -1,6 +1,7 @@
 package io.github.guennhatking.libra_auction.models.person;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.List;
 
 import io.github.guennhatking.libra_auction.enums.account.TrangThaiEmail;
@@ -44,7 +45,7 @@ public class NguoiDung {
     @Enumerated(EnumType.STRING)
     protected TrangThaiTaiKhoan trangThaiTaiKhoan;
 
-    protected LocalDateTime thoiGianTao;
+    protected OffsetDateTime thoiGianTao;
 
     // CONSTRUCTOR
     public NguoiDung() {
@@ -53,7 +54,7 @@ public class NguoiDung {
     public NguoiDung(String hoVaTen, String email) {
         this.hoVaTen = hoVaTen;
         this.email = email;
-        this.thoiGianTao = LocalDateTime.now();
+        this.thoiGianTao = OffsetDateTime.now(ZoneOffset.ofHours(7));
     }
 
     // GETTER
@@ -97,7 +98,7 @@ public class NguoiDung {
         return trangThaiTaiKhoan;
     }
 
-    public LocalDateTime getThoiGianTao() {
+    public OffsetDateTime getThoiGianTao() {
         return thoiGianTao;
     }
 
@@ -142,7 +143,7 @@ public class NguoiDung {
         this.trangThaiTaiKhoan = trangThaiTaiKhoan;
     }
 
-    public void setThoiGianTao(LocalDateTime thoiGianTao) {
+    public void setThoiGianTao(OffsetDateTime thoiGianTao) {
         this.thoiGianTao = thoiGianTao;
     }
 }

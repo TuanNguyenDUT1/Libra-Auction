@@ -1,6 +1,6 @@
 package io.github.guennhatking.libra_auction.viewmodels.request;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 import java.util.List;
 import java.util.Map;
 
@@ -15,8 +15,8 @@ public record AuctionSearchRequest(
         Long startingPrice,
 
         // Time range
-        LocalDateTime timeStart,
-        LocalDateTime timeEnd,
+        OffsetDateTime timeStart,
+        OffsetDateTime timeEnd,
 
         // Attributes filter
         List<Map<String, String>> attributes,

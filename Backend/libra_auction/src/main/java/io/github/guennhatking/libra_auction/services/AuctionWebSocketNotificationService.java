@@ -6,7 +6,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
+import java.time.ZoneOffset;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -46,7 +47,7 @@ public class AuctionWebSocketNotificationService {
      * @param auctionId The auction ID
      * @param newEndTime The new end time
      */
-    public void sendAuctionExtensionNotification(String auctionId, LocalDateTime newEndTime) {
+    public void sendAuctionExtensionNotification(String auctionId, OffsetDateTime newEndTime) {
         try {
             Map<String, Object> notification = new HashMap<>();
             notification.put("type", "AUCTION_EXTENDED");
@@ -75,7 +76,7 @@ public class AuctionWebSocketNotificationService {
             notification.put("type", "STATUS_CHANGE");
             notification.put("auctionId", auctionId);
             notification.put("status", status);
-            notification.put("timestamp", LocalDateTime.now());
+            notification.put("timestamp", OffsetDateTime.now(ZoneOffset.ofHours(7)));
             
             messagingTemplate.convertAndSend(
                 (Object) ("/topic/auction/" + auctionId + "/status"),

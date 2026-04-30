@@ -1,12 +1,12 @@
 package io.github.guennhatking.libra_auction.viewmodels.response;
 
-import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 public record BidResponse(
         String auctionId,
         Long bidAmount,
         String bidderId,
         String bidderName,
-        LocalDateTime bidTime,
+        OffsetDateTime bidTime,
         String status) {
 }
