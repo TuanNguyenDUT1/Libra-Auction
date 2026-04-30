@@ -17,5 +17,5 @@ public interface PhienDauGiaRepository extends JpaRepository<PhienDauGia, String
 
     List<PhienDauGia> findByTaiSan(TaiSan taiSan);
 
-    Optional<PhienDauGia> findByIdAndTaiSan_Category_Id(String id, String categoryId);
+    Optional<PhienDauGia> findByIdAndTaiSan_DanhMuc_Id(String id, String categoryId);
 }
