@@ -3,7 +3,6 @@ package io.github.guennhatking.libra_auction.services;
 import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 import java.time.OffsetDateTime;
-import java.time.ZoneId;
 import java.util.Set;
 
 /**
