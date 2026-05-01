@@ -11,7 +11,6 @@ import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 @Component
 public class JwtAuthFilter extends OncePerRequestFilter {
@@ -42,32 +41,26 @@ public class JwtAuthFilter extends OncePerRequestFilter {
             String authHeader = request.getHeader("Authorization");
             if (authHeader != null && authHeader.startsWith("Bearer ")) {
                 token = authHeader.substring(7);
-                System.out.println("Token from HEADER");
             }
 
             if (token == null) {
                 token = getTokenFromCookie(request);
-                if (token != null) {
-                    System.out.println("Token from COOKIE");
-                }
             }
-            System.out.println("Token: " + token);
-            System.out.println("Cookies: " + Arrays.toString(request.getCookies()));
+
             if (token != null && jwtRSA.verifyToken(token, jwtUtils.getPublicKey())) {
                 String userId = jwtRSA.extractClaim(token, "sub");
 
-                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(userId,
-                        null, new ArrayList<>());
+                JwtUserDetails principal = new JwtUserDetails(userId);
+                UsernamePasswordAuthenticationToken authentication = new UsernamePasswordAuthenticationToken(
+                        principal, null, new ArrayList<>());
 
-                System.out.println("Authorities: " + authentication.getAuthorities());
+                logger.info("PRINCIPAL: " + principal.toString());
                 SecurityContextHolder.getContext().setAuthentication(authentication);
             }
-            System.out
-                    .println("Authentication after filter: " + SecurityContextHolder.getContext().getAuthentication());
         } catch (Exception e) {
             logger.error("Cannot set user authentication", e);
         }
-
+        logger.info("REQUEST URI: " + request.getRequestURI());
         filterChain.doFilter(request, response);
     }
 

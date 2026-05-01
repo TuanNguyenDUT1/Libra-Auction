@@ -30,5 +30,19 @@ public record AuctionSearchRequest(
 
         // Sorting
         String sortBy,
-        String sortOrder) {
+        String sortOrder,
+        // Owner id – optional, null when not filtering by owner
+        String chuSoHuuId) {
+
+    // Secondary constructor for legacy calls (13 args)
+    public AuctionSearchRequest(String name, String categoryId,
+                               Long priceFrom, Long priceTo, Long startingPrice,
+                               OffsetDateTime timeStart, OffsetDateTime timeEnd,
+                               List<Map<String, String>> attributes,
+                               String status, Integer page, Integer pageSize,
+                               String sortBy, String sortOrder) {
+        this(name, categoryId, priceFrom, priceTo, startingPrice,
+                timeStart, timeEnd, attributes, status, page, pageSize,
+                sortBy, sortOrder, null);
+    }
 }

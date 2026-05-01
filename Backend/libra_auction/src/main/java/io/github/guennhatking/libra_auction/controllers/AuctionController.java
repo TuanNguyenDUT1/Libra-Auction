@@ -4,7 +4,9 @@ import io.github.guennhatking.libra_auction.services.AuctionSearchService;
 import io.github.guennhatking.libra_auction.services.AuctionService;
 import io.github.guennhatking.libra_auction.utils.ParseDateTime;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionCreateRequest;
+import io.github.guennhatking.libra_auction.security.JwtUserDetails;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionSearchRequest;
+import io.github.guennhatking.libra_auction.viewmodels.request.AuctionSearchRequestWrapper;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionUpdateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.AuctionResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.PageResponse;
@@ -21,6 +23,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 
 import java.time.OffsetDateTime;
 
@@ -82,6 +85,43 @@ public class AuctionController {
 
         PageResponse<AuctionResponse> result = searchService.searchAuctions(criteria);
 
+        return ResponseEntity.ok(ServerAPIResponse.success(result));
+    }
+
+    // ---------------------------------------------------------------------
+    // Owner‑only auctions endpoint – uses @AuthenticationPrincipal to obtain
+    // the current user id from the SecurityContext (populated by JwtAuthFilter).
+    // ---------------------------------------------------------------------
+    @GetMapping("/auctions")
+    public ResponseEntity<ServerAPIResponse<PageResponse<AuctionResponse>>> getMyAuctions(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(required = false) String name,
+            @RequestParam(required = false) Long priceFrom,
+            @RequestParam(required = false) Long priceTo,
+            @RequestParam(required = false) Long startingPrice,
+            @RequestParam(required = false) String timeStart,
+            @RequestParam(required = false) String timeEnd,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize,
+            @RequestParam(defaultValue = "thoiGianBatDau") String sortBy,
+            @RequestParam(defaultValue = "DESC") String sortOrder) {
+
+        // Build base criteria (same as public search)
+        AuctionSearchRequest baseCriteria = buildSearchCriteria(
+                name, null, priceFrom, priceTo, startingPrice,
+                timeStart, timeEnd, status,
+                page, pageSize, sortBy, sortOrder);
+
+        // Ensure authentication succeeded
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(ServerAPIResponse.error("Authentication required"));
+        }
+        AuctionSearchRequest ownerCriteria = AuctionSearchRequestWrapper
+                .withOwnerId(baseCriteria, userDetails.getUserId());
+
+        PageResponse<AuctionResponse> result = searchService.searchAuctions(ownerCriteria);
         return ResponseEntity.ok(ServerAPIResponse.success(result));
     }
 

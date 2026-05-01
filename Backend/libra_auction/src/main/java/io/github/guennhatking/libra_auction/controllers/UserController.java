@@ -29,7 +29,6 @@ public class UserController {
 
     @GetMapping("/{id}")
     public ResponseEntity<ServerAPIResponse<UserResponse>> getUserInfo(@PathVariable String id) {
-        System.out.println("GET /api/users");
         Optional<NguoiDung> user = userService.findById(id);
 
         if (user.isPresent()) {

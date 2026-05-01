@@ -59,8 +59,10 @@ public class AuctionSearchService {
                 .filter(session -> filterByTimeRange(session, criteria.timeStart(), criteria.timeEnd()))
                 .filter(session -> filterByStatus(session, criteria.status()))
                 .filter(session -> filterByAttributes(session, criteria.attributes()))
+                .filter(session -> filterByOwner(session, criteria.chuSoHuuId()))
                 .collect(Collectors.toList());
     }
+
 
     private boolean filterByName(PhienDauGia session, String name) {
         if (name == null || name.isBlank()) {
@@ -130,6 +132,7 @@ public class AuctionSearchService {
     }
 
     private boolean filterByAttributes(PhienDauGia session, List<java.util.Map<String, String>> attributes) {
+
         if (attributes == null || attributes.isEmpty()) {
             return true;
         }
@@ -152,6 +155,16 @@ public class AuctionSearchService {
                             taiSanAttr.getGiaTri() != null &&
                             taiSanAttr.getGiaTri().equals(attrValue));
         });
+    }
+
+    private boolean filterByOwner(PhienDauGia session, String ownerId) {
+        if (ownerId == null || ownerId.isBlank()) {
+            return true; // no owner filter
+        }
+        if (session.getNguoiTao() == null) {
+            return false;
+        }
+        return ownerId.equals(session.getNguoiTao().getId());
     }
 
     private List<PhienDauGia> applySort(List<PhienDauGia> sessions, AuctionSearchRequest criteria) {
