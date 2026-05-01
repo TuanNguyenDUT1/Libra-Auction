@@ -1,20 +1,13 @@
 'use server';
-import { CategoryCardType } from "@/types/category_card_type";
-export async function FetchCategories(): Promise<CategoryCardType[]> {
-  try {
-    const res = await fetch(process.env.BACKEND_SERVER_URL! + "/api/categories");
+import { ServerAPICall } from "@/lib/server_API_call";
+import { Category } from "@/types/category";
 
-    if (!res.ok) {
-      return [];
+export async function fetchCategories(): Promise<Category[]> {
+    const request: RequestInit = {
+        method: "GET",
     }
-
-    const data = (await res.json()) as CategoryCardType[];
-    for (const category of data) {
-      category.href = "/categories/" + category.id;
-    }
-    return data;
-  } catch (error) {
-    console.log("FetchCategories error:", error);
-    return [];
-  }
+    const res = await ServerAPICall<Category[]>("/api/public/categories", request);
+    if (res.isSuccess && res.data) return res.data;
+    else if(res.isSuccess) return [];
+    throw new Error(res.errorMessage || "Failed to fetch categories");
 }

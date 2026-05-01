@@ -1,10 +1,13 @@
-import UserMenu from "@/components/user_menu";
+import UserMenu from "@/components/main/user_menu_drop";
+import { getIdFromToken } from "@/lib/get_id_from_token";
 import { isAuthenticated } from "@/lib/is_authenticated";
-import { FetchUserInfo } from "@/services/fetch_user_info";
+import { fetchUserInfo } from "@/services/fetch_user_info";
 
 export default async function Header() {
   const authed = await isAuthenticated();
-  const userInfo = await FetchUserInfo();
+  const user_id = await getIdFromToken();
+  if(!(authed && user_id)) return null;
+  const userInfo = await fetchUserInfo(user_id);
   const authedUserActionItems = [
     { value: "Profile", href: "/profile" },
     { value: "Auction Lobby", href: "/" },

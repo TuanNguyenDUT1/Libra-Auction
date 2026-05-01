@@ -1,8 +1,8 @@
 import Link from "next/link";
-import BannerImage from "@/public/background-login.jpg";
+import BannerImage from "@/public/background_login.jpg";
 import Image from "next/image";
-import GoogleSignInButton from "@/components/sign_in_with_google";
-import SignInWithPassword from "@/components/sign_in_with_password";
+import GoogleSignInButton from "@/components/main/auth/sign_in_with_google";
+import SignInWithPassword from "@/components/main/auth/sign_in_with_password";
 export default function page() {
   return (
     <div className="p-8 grid grid-cols-2 gap-6">

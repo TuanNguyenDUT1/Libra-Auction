@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
-import Header from "@/components/header";
-import Footer from "@/components/footer";
+import Header from "@/components/main/header";
+import Footer from "@/components/main/footer";
 export const metadata: Metadata = {
   title: "Libra Auction",
   description: "An Online Auction System",

@@ -1,18 +1,18 @@
 'use server';
 import { ServerAPICall } from "@/lib/server_API_call";
-import { mapAuctionToLiveAuction } from "@/mappers/map_auction_to_live_auction";
+import { mapAuctionToUpcoming } from "@/mappers/map_auction_to_upcoming_auction";
 import { Auction } from "@/types/auction/auction";
-import { LiveAuction } from "@/types/auction/live_auction";
 import { PageResponse } from "@/types/page_response";
+import { UpcomingAuction } from "@/types/auction/upcoming_auction";
 
-export async function fetchLiveAuctions(): Promise<LiveAuction[]> {
+export async function fetchUpcomingAuctions(): Promise<UpcomingAuction[]> {
     const request: RequestInit = {
         method: "GET",
     }
     const res = await ServerAPICall<PageResponse<Auction>>("/api/public/auctions?status=DANG_DIEN_RA", request);
     if (res.isSuccess && res.data) {
-        return res.data.content.map((i) => mapAuctionToLiveAuction(i));
+        return res.data.content.map((i) => mapAuctionToUpcoming(i));
     }
     else if(res.isSuccess) return [];
-    throw new Error(res.errorMessage || "Failed to fetch live auctions");
+    throw new Error(res.errorMessage || "Failed to fetch upcoming auctions");
 }

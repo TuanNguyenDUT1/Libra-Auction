@@ -1,25 +1,24 @@
-import { cookies } from "next/headers";
+'use server';
 import * as jose from "jose";
 import { JWSSignatureVerificationFailed, JWTExpired } from "jose/errors";
 import { getCert } from "./get_cert";
 import { refreshToken } from "./refresh_token";
+import { getJWTTokenInfo } from "./get_jwt_token_info";
 
 export async function isAuthenticated() {
-    const cookieStore = await cookies();
-    const jwtToken = cookieStore.get("jwtToken");
+    const jwtTokenInfo = await getJWTTokenInfo();
     const alg = 'RS256';
     const spki = await getCert();
-    if (spki && jwtToken && jwtToken.value) {
+    if (spki && jwtTokenInfo.token) {
         const publicKey = await jose.importSPKI(spki, alg);
         try {
-            await jose.jwtVerify(jwtToken.value, publicKey);
+            await jose.jwtVerify(jwtTokenInfo.token, publicKey);
         }
         catch (error) {
             if (error instanceof JWTExpired) {
                 console.log("Token hết hạn");
                 return await refreshToken();
             }
-
 
             if (error instanceof JWSSignatureVerificationFailed) {
                 console.log("Invaild token");

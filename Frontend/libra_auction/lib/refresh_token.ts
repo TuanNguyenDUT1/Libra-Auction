@@ -1,32 +1,29 @@
-import { cookies } from "next/headers";
+'use server';
 import { getCert } from "./get_cert";
 import * as jose from "jose";
+import { getJWTTokenInfo } from "./get_jwt_token_info";
 
 export async function refreshToken() {
-    const cookieStore = await cookies();
-    const refreshToken = cookieStore.get("refreshToken");
-    const jwtToken = cookieStore.get("jwtToken");
+    const jwtTokenInfo = await getJWTTokenInfo();
     const alg = 'RS256';
     const spki = await getCert();
-    if (spki && jwtToken && jwtToken.value) {
+    if (spki && jwtTokenInfo.refresh) {
         const publicKey = await jose.importSPKI(spki, alg);
-        if (refreshToken && refreshToken.value) {
-            try {
-                await jose.jwtVerify(refreshToken.value, publicKey);
-                const res = await fetch('api/refresh', {
-                    method: "POST",
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        'refreshToken': refreshToken.value
-                    })
-                });
-                return true;
-            } catch (insideError) {
-                console.log("Can't refresh token")
-                return false;
-            }
+        try {
+            await jose.jwtVerify(jwtTokenInfo.refresh, publicKey);
+            await fetch('api/refresh', {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    'refreshToken': jwtTokenInfo.refresh
+                })
+            });
+            return true;
+        } catch (error) {
+            console.error("Can't refresh token: " + error)
+            return false;
         }
     }
     return false;

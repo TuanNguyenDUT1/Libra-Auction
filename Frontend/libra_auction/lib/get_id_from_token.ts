@@ -1,19 +1,18 @@
-import { cookies } from "next/headers";
+'use server';
 import { getCert } from "./get_cert";
 import * as jose from "jose";
 import { JWSSignatureVerificationFailed, JWTExpired } from "jose/errors";
-import { refresh } from "next/cache";
 import { refreshToken } from "./refresh_token";
+import { getJWTTokenInfo } from "./get_jwt_token_info";
 
 export async function getIdFromToken(): Promise<string | null> {
-    const cookieStore = await cookies();
-    const jwtToken = cookieStore.get("jwtToken");
+    const jwtTokenInfo = await getJWTTokenInfo();
     const alg = 'RS256';
     const spki = await getCert();
-    if (spki && jwtToken && jwtToken.value) {
+    if (spki && jwtTokenInfo.token) {
         const publicKey = await jose.importSPKI(spki, alg);
         try {
-            const { payload } = await jose.jwtVerify(jwtToken.value, publicKey);
+            const { payload } = await jose.jwtVerify(jwtTokenInfo.token, publicKey);
             return payload.sub as string; 
         }
         catch (error) {
@@ -30,7 +29,6 @@ export async function getIdFromToken(): Promise<string | null> {
             }
             return null;
         }
-        return null;
     }
     return null;
 }

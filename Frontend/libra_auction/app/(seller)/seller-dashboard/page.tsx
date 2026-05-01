@@ -1,11 +1,11 @@
-import { stats, recentAuctions } from "@/data/data";
+// import { stats, recentAuctions } from "@/data/data";
 
 export default function page() {
   return (
     <div className="space-y-8">
       {/* 4 Cards Thống kê */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-        {stats.map((item) => (
+        {/* {stats.map((item) => (
           <div key={item.label} className="p-5 bg-white border border-[#AFD3E2] rounded-lg">
             <p className="text-sm text-gray-500 font-medium">{item.label}</p>
             <div className="flex items-baseline gap-2 mt-2">
@@ -13,7 +13,7 @@ export default function page() {
               <span className="text-xs text-green-500 font-semibold">{item.change}</span>
             </div>
           </div>
-        ))}
+        ))} */}
       </div>
 
       {/* Mock Chart Section */}
@@ -48,7 +48,7 @@ export default function page() {
               </tr>
             </thead>
             <tbody className="divide-y divide-[#AFD3E2]">
-              {recentAuctions.map((auction) => (
+              {/* {recentAuctions.map((auction) => (
                 <tr key={auction.id} className="hover:bg-[#F6F1F1] transition-colors">
                   <td className="p-4 font-medium">{auction.name}</td>
                   <td className="p-4 text-[#146C94] font-semibold">{auction.price}</td>
@@ -61,7 +61,7 @@ export default function page() {
                   </td>
                   <td className="p-4 text-gray-600">{auction.bids} bids</td>
                 </tr>
-              ))}
+              ))} */}
             </tbody>
           </table>
         </div>

@@ -1,3 +1,4 @@
+'use client';
 export async function signUp(fullName: string, username: string, email: string, password: string, confirmPassword: string, onSuccess: () => void, onFailed: (message: string) => void) {
     try {
         if (password !== confirmPassword) {

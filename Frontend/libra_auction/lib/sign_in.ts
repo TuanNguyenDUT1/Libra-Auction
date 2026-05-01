@@ -1,3 +1,4 @@
+'use client';
 export async function signInPassword(username: string, password: string, onSuccess: () => void, onFailed: (message: string) => void) {
     const res = await fetch('/api/auth/password', {
         method: 'POST',
