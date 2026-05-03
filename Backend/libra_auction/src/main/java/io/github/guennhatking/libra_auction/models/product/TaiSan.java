@@ -1,5 +1,6 @@
 package io.github.guennhatking.libra_auction.models.product;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -46,6 +47,8 @@ public class TaiSan {
 
     private String tenTaiSan;
     private Integer soLuong;
+    
+    @Column(columnDefinition = "TEXT")
     private String moTa;
 
     // CONSTRUCTOR
