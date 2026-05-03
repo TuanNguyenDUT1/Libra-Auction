@@ -4,8 +4,10 @@ import io.github.guennhatking.libra_auction.services.ProductService;
 import io.github.guennhatking.libra_auction.viewmodels.request.ProductCreateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.request.ProductUpdateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.ProductResponse;
+import io.github.guennhatking.libra_auction.security.JwtUserDetails; 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -41,39 +44,47 @@ public class ProductController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     public ProductResponse createProduct(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
             @RequestPart("data") ProductCreateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        System.out.println("CONTROLLER HIT");
+        
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        
+        String userId = userDetails.getUserId();
 
-        System.out.println("tenTaiSan: " + request.tenTaiSan());
-        System.out.println("soLuong: " + request.soLuong());
-
-        System.out.println("Images count: " + (images != null ? images.size() : 0));
-
-        return productService.createProduct(request, images);
+        return productService.createProduct(request, images, userId);
     }
 
     @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ProductResponse updateProduct(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
             @PathVariable String id,
             @RequestPart("data") ProductUpdateRequest request,
             @RequestPart(value = "images", required = false) List<MultipartFile> images) {
-        System.out.println("=== UPDATE CONTROLLER HIT ===");
 
-        System.out.println("ID: " + id);
-        System.out.println("tenTaiSan: " + request.tenTaiSan());
-        System.out.println("soLuong: " + request.soLuong());
-        System.out.println("Existing images: " +
-                (request.existingImages() != null ? request.existingImages().size() : 0));
-        System.out.println("New images: " +
-                (images != null ? images.size() : 0));
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+        
+        String userId = userDetails.getUserId();
 
-        return productService.updateProduct(id, request, images);
+        return productService.updateProduct(id, request, images, userId);
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteProduct(@PathVariable String id) {
-        productService.deleteProduct(id);
+    public void deleteProduct(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id) {
+        
+        if (userDetails == null) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Authentication required");
+        }
+
+        String userId = userDetails.getUserId();
+
+        productService.deleteProduct(id, userId);
     }
 }

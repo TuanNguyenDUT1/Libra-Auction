@@ -5,6 +5,8 @@ import io.github.guennhatking.libra_auction.models.product.DanhMuc;
 import io.github.guennhatking.libra_auction.models.product.HinhAnhTaiSan;
 import io.github.guennhatking.libra_auction.models.product.TaiSan;
 import io.github.guennhatking.libra_auction.models.product.ThuocTinhTaiSan;
+import io.github.guennhatking.libra_auction.models.person.NguoiDung;
+import io.github.guennhatking.libra_auction.repositories.person.NguoiDungRepository;
 import io.github.guennhatking.libra_auction.repositories.auction.PhienDauGiaRepository;
 import io.github.guennhatking.libra_auction.repositories.product.DanhMucRepository;
 import io.github.guennhatking.libra_auction.repositories.product.HinhAnhTaiSanRepository;
@@ -18,6 +20,7 @@ import io.github.guennhatking.libra_auction.viewmodels.response.ProductResponse;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.security.access.AccessDeniedException;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,6 +33,7 @@ public class ProductService {
     private final ImageUploadService imageUploadService;
     private final ThuocTinhTaiSanRepository thuocTinhTaiSanRepository;
     private final ProductResponseMapper productResponseMapper;
+    private final NguoiDungRepository nguoiDungRepository; 
 
     public ProductService(DanhMucRepository danhMucRepository,
             TaiSanRepository taiSanRepository,
@@ -37,13 +41,15 @@ public class ProductService {
             PhienDauGiaRepository phienDauGiaRepository,
             ImageUploadService imageUploadService,
             ThuocTinhTaiSanRepository thuocTinhTaiSanRepository,
-            ProductResponseMapper productResponseMapper) {
+            ProductResponseMapper productResponseMapper
+            , NguoiDungRepository nguoiDungRepository) {
         this.danhMucRepository = danhMucRepository;
         this.taiSanRepository = taiSanRepository;
         this.hinhAnhTaiSanRepository = hinhAnhTaiSanRepository;
         this.imageUploadService = imageUploadService;
         this.thuocTinhTaiSanRepository = thuocTinhTaiSanRepository;
         this.productResponseMapper = productResponseMapper;
+        this.nguoiDungRepository = nguoiDungRepository;
     }
 
     @Transactional(readOnly = true)
@@ -60,8 +66,11 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse createProduct(ProductCreateRequest request, List<MultipartFile> images) {
+    public ProductResponse createProduct(ProductCreateRequest request, List<MultipartFile> images, String userId) {
         System.out.println("=== SERVICE START ===");
+
+        NguoiDung nguoiTao = nguoiDungRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("User not found"));
 
         System.out.println("Finding category with id: " + request.danhMucId());
 
@@ -78,6 +87,8 @@ public class ProductService {
                 request.soLuong(),
                 request.moTa(),
                 category);
+                
+        product.setNguoiTao(nguoiTao);
 
         TaiSan savedProduct = taiSanRepository.save(product);
         System.out.println("Saved product ID: " + savedProduct.getId());
@@ -141,12 +152,16 @@ public class ProductService {
     }
 
     @Transactional
-    public ProductResponse updateProduct(String id, ProductUpdateRequest request, List<MultipartFile> images) {
+    public ProductResponse updateProduct(String id, ProductUpdateRequest request, List<MultipartFile> images, String userId) {
         System.out.println("=== UPDATE SERVICE START ===");
 
         // --- 1. Tìm product ---
         TaiSan product = taiSanRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (!userId.equals(product.getNguoiTao().getId())) {
+            throw new AccessDeniedException("Bạn không có quyền chỉnh sửa tài sản này");
+        }
 
         // --- 2. Tìm category ---
         DanhMuc category = danhMucRepository.findById(request.danhMucId())
@@ -160,9 +175,7 @@ public class ProductService {
 
         TaiSan updatedProduct = taiSanRepository.save(product);
 
-        // =========================================================
         // --- 4. XỬ LÝ ATTRIBUTES ---
-        // =========================================================
         System.out.println("=== UPDATE ATTRIBUTES ===");
 
         // Xóa toàn bộ attribute cũ
@@ -183,9 +196,7 @@ public class ProductService {
             }
         }
 
-        // =========================================================
         // --- 5. XỬ LÝ IMAGES ---
-        // =========================================================
         System.out.println("=== UPDATE IMAGES ===");
 
         List<String> finalImageUrls = new ArrayList<>();
@@ -232,9 +243,14 @@ public class ProductService {
     }
 
     @Transactional
-    public void deleteProduct(String id) {
+    public void deleteProduct(String id, String userId) {
         TaiSan product = taiSanRepository.findById(id)
                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        if (!userId.equals(product.getNguoiTao().getId())) {
+            throw new AccessDeniedException("Bạn không có quyền xóa tài sản này");
+        }
+
         taiSanRepository.delete(product);
     }
 }

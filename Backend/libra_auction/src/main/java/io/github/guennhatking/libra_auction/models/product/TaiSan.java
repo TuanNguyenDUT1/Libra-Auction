@@ -10,12 +10,16 @@ import jakarta.persistence.OneToMany;
 import java.util.List;
 
 import io.github.guennhatking.libra_auction.models.auction.ThongTinPhienDauGia;
+import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 
 @Entity
 public class TaiSan {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     private String id;
+
+    @ManyToOne
+    private NguoiDung nguoiTao;
 
     @OneToOne(mappedBy = "taiSan")
     private ThongTinPhienDauGia thongTinPhienDauGia;
@@ -60,6 +64,10 @@ public class TaiSan {
         return id;
     }
 
+    public NguoiDung getNguoiTao() {
+        return nguoiTao;
+    }
+
     public ThongTinPhienDauGia getThongTinPhienDauGia() {
         return thongTinPhienDauGia;
     }
@@ -91,6 +99,10 @@ public class TaiSan {
     // SETTER
     public void setId(String id) {
         this.id = id;
+    }
+
+    public void setNguoiTao(NguoiDung nguoiTao) {
+        this.nguoiTao = nguoiTao;
     }
 
     public void setThongTinPhienDauGia(ThongTinPhienDauGia thongTinPhienDauGia) {
