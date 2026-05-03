@@ -116,7 +116,7 @@ public class AuctionController {
         // Ensure authentication succeeded
         if (userDetails == null) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
-                .body(ServerAPIResponse.error("Authentication required"));
+                    .body(ServerAPIResponse.error("Authentication required"));
         }
         AuctionSearchRequest ownerCriteria = AuctionSearchRequestWrapper
                 .withOwnerId(baseCriteria, userDetails.getUserId());
@@ -137,9 +137,18 @@ public class AuctionController {
 
     @PostMapping("/auctions")
     public ResponseEntity<ServerAPIResponse<AuctionResponse>> createAuction(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
             @Valid @RequestBody AuctionCreateRequest request) {
 
-        AuctionResponse response = auctionService.createAuction(request);
+        // Ensure authentication succeeded
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        String userId = userDetails.getUserId();
+
+        AuctionResponse response = auctionService.createAuction(request, userId);
 
         return ResponseEntity
                 .status(HttpStatus.CREATED)
@@ -148,18 +157,38 @@ public class AuctionController {
 
     @PutMapping("/auctions/{id}")
     public ResponseEntity<ServerAPIResponse<AuctionResponse>> updateAuction(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
             @PathVariable String id,
             @Valid @RequestBody AuctionUpdateRequest request) {
 
-        AuctionResponse response = auctionService.updateAuction(id, request);
+        // Ensure authentication succeeded
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        String userId = userDetails.getUserId();
+
+        AuctionResponse response = auctionService.updateAuction(id, request, userId);
 
         return ResponseEntity.ok(ServerAPIResponse.success(response));
     }
 
     @DeleteMapping("/auctions/{id}")
-    public ResponseEntity<Void> deleteAuction(@PathVariable String id) {
-        auctionService.deleteAuction(id);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ServerAPIResponse<Void>> deleteAuction(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        String userId = userDetails.getUserId();
+
+        auctionService.deleteAuction(id, userId);
+
+        return ResponseEntity.ok(ServerAPIResponse.success(null));
     }
 
     private AuctionSearchRequest buildSearchCriteria(

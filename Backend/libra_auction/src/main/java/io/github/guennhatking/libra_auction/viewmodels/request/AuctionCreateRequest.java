@@ -9,25 +9,17 @@ import java.time.OffsetDateTime;
 import io.github.guennhatking.libra_auction.enums.auction.LoaiDauGia;
 
 public record AuctionCreateRequest(
-    @NotBlank(message = "taiSanId is required")
-    String taiSanId,
+        @NotBlank(message = "taiSanId is required") String taiSanId,
 
-    @NotNull(message = "thoiGianBatDau is required")
-    OffsetDateTime thoiGianBatDau,
+        @NotNull(message = "thoiGianBatDau is required") OffsetDateTime thoiGianBatDau,
 
-    @NotNull(message = "thoiLuong is required")
-    @Positive(message = "thoiLuong must be greater than 0")
-    Long thoiLuong,
+        @NotNull(message = "thoiLuong is required") @Positive(message = "thoiLuong must be greater than 0") Long thoiLuong,
+        
+        @NotNull(message = "tienCoc is required") @Positive(message = "tienCoc must be greater than 0") Long tienCoc,
 
-    @NotNull(message = "giaKhoiDiem is required")
-    @Positive(message = "giaKhoiDiem must be greater than 0")
-    Long giaKhoiDiem,
+        @NotNull(message = "giaKhoiDiem is required") @Positive(message = "giaKhoiDiem must be greater than 0") Long giaKhoiDiem,
 
-    @NotNull(message = "buocGiaNhoNhat is required")
-    @Positive(message = "buocGiaNhoNhat must be greater than 0")
-    Long buocGiaNhoNhat,
+        @NotNull(message = "buocGiaNhoNhat is required") @Positive(message = "buocGiaNhoNhat must be greater than 0") Long buocGiaNhoNhat,
 
-    @NotNull(message = "loaiDauGia is required")
-    LoaiDauGia loaiDauGia
-) {
+        @NotNull(message = "loaiDauGia is required") LoaiDauGia loaiDauGia) {
 }

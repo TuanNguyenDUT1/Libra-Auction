@@ -5,12 +5,16 @@ import io.github.guennhatking.libra_auction.enums.auction.TrangThaiPhien;
 import io.github.guennhatking.libra_auction.mappers.AuctionMapper;
 import io.github.guennhatking.libra_auction.models.auction.PhienDauGia;
 import io.github.guennhatking.libra_auction.models.auction.ThongTinPhienDauGia;
+import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 import io.github.guennhatking.libra_auction.models.product.TaiSan;
 import io.github.guennhatking.libra_auction.repositories.auction.PhienDauGiaRepository;
+import io.github.guennhatking.libra_auction.repositories.person.NguoiDungRepository;
 import io.github.guennhatking.libra_auction.repositories.product.TaiSanRepository;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionCreateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionUpdateRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.AuctionResponse;
+
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Comparator;
@@ -21,13 +25,16 @@ public class AuctionService {
         private final PhienDauGiaRepository phienDauGiaRepository;
         private final AuctionMapper auctionMapper;
         private final TaiSanRepository taiSanRepository;
+        private final NguoiDungRepository nguoiDungRepository;
 
         public AuctionService(PhienDauGiaRepository phienDauGiaRepository,
                         AuctionMapper auctionMapper,
-                        TaiSanRepository taiSanRepository) {
+                        TaiSanRepository taiSanRepository,
+                        NguoiDungRepository nguoiDungRepository) {
                 this.phienDauGiaRepository = phienDauGiaRepository;
                 this.auctionMapper = auctionMapper;
                 this.taiSanRepository = taiSanRepository;
+                this.nguoiDungRepository = nguoiDungRepository;
         }
 
         @Transactional(readOnly = true)
@@ -57,7 +64,7 @@ public class AuctionService {
         }
 
         @Transactional
-        public AuctionResponse createAuction(AuctionCreateRequest request) {
+        public AuctionResponse createAuction(AuctionCreateRequest request, String userId) {
                 TaiSan product = taiSanRepository.findById(request.taiSanId())
                                 .orElseThrow(() -> new IllegalArgumentException("Product not found"));
 
@@ -65,15 +72,18 @@ public class AuctionService {
                         throw new IllegalArgumentException("Product already has an auction session");
                 }
 
+                NguoiDung nguoiTao = nguoiDungRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
                 ThongTinPhienDauGia auctionInfo = new ThongTinPhienDauGia(
-                                0L,
+                                request.tienCoc(),
                                 request.giaKhoiDiem(),
                                 request.buocGiaNhoNhat(),
                                 product.getTenTaiSan(),
                                 product);
 
                 PhienDauGia session = new PhienDauGia(
-                                null,
+                                nguoiTao,
                                 auctionInfo,
                                 request.thoiGianBatDau(),
                                 request.giaKhoiDiem(),
@@ -91,9 +101,16 @@ public class AuctionService {
         }
 
         @Transactional
-        public AuctionResponse updateAuction(String id, AuctionUpdateRequest request) {
+        public AuctionResponse updateAuction(String id, AuctionUpdateRequest request, String userId) {
+                NguoiDung nguoiTao = nguoiDungRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
                 PhienDauGia session = phienDauGiaRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("Auction session not found"));
+
+                if (!nguoiTao.getId().equals(session.getNguoiTao().getId())) {
+                        throw new AccessDeniedException("You do not have permission to edit this auction.");
+                }
 
                 session.setThoiGianBatDau(request.thoiGianBatDau());
                 session.setThoiLuong(request.thoiLuong());
@@ -106,10 +123,17 @@ public class AuctionService {
         }
 
         @Transactional
-        public void deleteAuction(String id) {
+        public void deleteAuction(String id, String userId) {
+                NguoiDung nguoiTao = nguoiDungRepository.findById(userId)
+                                .orElseThrow(() -> new IllegalArgumentException("User not found"));
+
                 PhienDauGia session = phienDauGiaRepository.findById(id)
                                 .orElseThrow(() -> new IllegalArgumentException("Auction session not found"));
+
+                if (!nguoiTao.getId().equals(session.getNguoiTao().getId())) {
+                        throw new AccessDeniedException("Bạn không có quyền xóa phiên đấu giá này");
+                }
+
                 phienDauGiaRepository.delete(session);
         }
-
 }
