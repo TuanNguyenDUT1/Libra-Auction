@@ -125,12 +125,11 @@ public class AuctionController {
         return ResponseEntity.ok(ServerAPIResponse.success(result));
     }
 
-    @GetMapping("/public/categories/{categoryId}/auctions/{id}")
+    @GetMapping("/public/auctions/{id}")
     public ResponseEntity<ServerAPIResponse<AuctionResponse>> getAuctionByIdInCategory(
-            @PathVariable String categoryId,
             @PathVariable String id) {
 
-        AuctionResponse response = auctionService.getAuctionByIdAndCategory(id, categoryId);
+        AuctionResponse response = auctionService.getAuctionById(id);
 
         return ResponseEntity.ok(ServerAPIResponse.success(response));
     }
