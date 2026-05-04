@@ -6,7 +6,8 @@ const menuItems = [
   { name: 'Dashboard', href: '/seller-dashboard/' },
   { name: 'Auctions', href: '/seller-dashboard/auctions' },
   { name: 'Products', href: '/seller-dashboard/products' },
-  { name: 'Transactions', href: '/seller-dashboard/transactions' },
+  // TODO: transactions
+  // { name: 'Transactions', href: '/seller-dashboard/transactions' }, 
 ];
 
 export default function Sidebar() {
@@ -15,7 +16,7 @@ export default function Sidebar() {
       <div className="text-2xl font-bold mb-8 p-2">
       <Link href="/" className="flex items-center gap-2 flex-1">
         <Image src={logo_img} alt="Libra Auction" className="h-8 w-8" />
-        <span className="text-[1.25rem] font-bold text-(--primary-color)">
+        <span className="text-[1.25rem] font-bold text-white">
           Libra Auction
         </span>
       </Link>

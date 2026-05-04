@@ -1,5 +1,5 @@
 "use client";
-
+import Image from "next/image";
 import { useState } from "react";
 
 export const ImageGallery = ({ images }: { images: string[] }) => {
@@ -8,23 +8,23 @@ export const ImageGallery = ({ images }: { images: string[] }) => {
   return (
     <div className="flex flex-col gap-4">
       {/* Ảnh chính */}
-      <div className="aspect-square w-full rounded-2xl overflow-hidden border border-gray-100 bg-white">
-        <img 
-          src={mainImage} 
-          alt="Product" 
-          className="w-full h-full object-contain p-4"
+      <div className="relative aspect-square w-full rounded-2xl overflow-hidden border border-gray-100 bg-white">
+        <Image
+          src={mainImage}
+          alt="Product"
+          fill
+          className="object-contain p-4"
         />
       </div>
-      
+
       {/* Danh sách ảnh thu nhỏ */}
       <div className="flex gap-2 overflow-x-auto pb-2">
         {images.map((img, idx) => (
           <button
             key={idx}
             onClick={() => setMainImage(img)}
-            className={`flex-shrink-0 w-20 h-20 rounded-lg border-2 transition-all overflow-hidden bg-white ${
-              mainImage === img ? "border-[var(--primary-color)]" : "border-transparent"
-            }`}
+            className={`flex-shrink-0 w-20 h-20 rounded-lg border-2 transition-all overflow-hidden bg-white ${mainImage === img ? "border-[var(--primary-color)]" : "border-transparent"
+              }`}
           >
             <img src={img} alt={`Thumb ${idx}`} className="w-full h-full object-cover" />
           </button>

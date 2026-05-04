@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { Product } from "@/types/product_type";
+import { Product } from "@/types/product/product";
 
 interface ProductDeleteConfirmProps {
   product: Product;

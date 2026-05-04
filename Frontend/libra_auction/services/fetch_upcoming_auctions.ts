@@ -9,7 +9,7 @@ export async function fetchUpcomingAuctions(): Promise<UpcomingAuction[]> {
     const request: RequestInit = {
         method: "GET",
     }
-    const res = await ServerAPICall<PageResponse<Auction>>("/api/public/auctions?status=DANG_DIEN_RA", request);
+    const res = await ServerAPICall<PageResponse<Auction>>("/api/public/auctions?status=CHUA_BAT_DAU", request);
     if (res.isSuccess && res.data) {
         return res.data.content.map((i) => mapAuctionToUpcoming(i));
     }

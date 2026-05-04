@@ -1,3 +1,5 @@
+import { TrangThaiEmail, TrangThaiTaiKhoan } from "./status"
+
 export interface UserInfo {
     id: string,
     hoVaTen: string,
@@ -5,8 +7,8 @@ export interface UserInfo {
     CCCD: string,
     email: string,
     anhDaiDien: string,
-    trangThaiEmail: "DA_XAC_THUC" | "CHUA_XAC_THUC" | "CHO_XAC_THUC",
-    trangThaiTaiKhoan: "CHO_XAC_NHAN" | "HOAT_DONG" | "KHOA",
+    trangThaiEmail: TrangThaiEmail,
+    trangThaiTaiKhoan: TrangThaiTaiKhoan,
     roles: Role[]
 }
 

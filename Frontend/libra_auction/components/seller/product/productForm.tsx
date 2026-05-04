@@ -1,24 +1,27 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { AttributeType } from "@/types/attribute_type";
+import { Attribute } from "@/types/product/attribute";
 import Image from "next/image";
-import { CategoryCardType } from "@/types/category_card_type";
-import { FetchCategories } from "@/services/fetch_categories";
+import { Category } from "@/types/category";
+import { fetchCategories } from "@/services/fetch_categories";
+import { uploadImageToCloudinary } from "@/services/image_upload_to_cloudinary";
+import { fetchImageUploadConfig } from "@/services/fetch_image_upload_config";
+import { NewProduct } from "@/types/product/new-product";
+import { createProduct } from "@/services/create_product";
 
 export default function ProductForm() {
-  const [attributes, setAttributes] = useState<AttributeType[]>([]);
+  const [attributes, setAttributes] = useState<Attribute[]>([]);
   const [images, setImages] = useState<File[]>([]);
   const [previews, setPreviews] = useState<string[]>([]);
-  const [categories, setCategories] = useState<CategoryCardType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
-    const fetchCategories = async () => {
-      const categories = await FetchCategories();
+    const loadCategories = async () => {
+      const categories: Category[] = await fetchCategories();
       setCategories(categories);
-      console.log("Fetched categories:", categories);
     };
-    fetchCategories();
+    loadCategories();
   }, []);
 
   const addAttribute = (isSystem: boolean) => {
@@ -29,7 +32,7 @@ export default function ProductForm() {
     setAttributes(attributes.filter((_, i) => i !== index));
   };
 
-  const updateAttribute = (index: number, field: keyof AttributeType, val: string) => {
+  const updateAttribute = (index: number, field: keyof Attribute, val: string) => {
     const newAttrs = [...attributes];
     newAttrs[index] = { ...newAttrs[index], [field]: val };
     setAttributes(newAttrs);
@@ -54,41 +57,33 @@ export default function ProductForm() {
   const handleSubmit: React.ComponentProps<"form">["onSubmit"] = async (e) => {
     e.preventDefault();
     const formData = new FormData(e.currentTarget);
-    const payload = {
-      tenTaiSan: formData.get("tenTaiSan"),
+    const newProduct: NewProduct = {
+      tenTaiSan: formData.get("tenTaiSan") as string,
       soLuong: Number(formData.get("soLuong")),
-      danhMucId: formData.get("danhMucId"),
-      moTa: formData.get("moTa"),
+      danhMucId: formData.get("danhMucId") as string,
+      moTa: formData.get("moTa") as string,
       attributes: attributes,
-    };
-    console.log(payload);
-    const submitData = new FormData();
-    submitData.append(
-      "data",
-      new Blob(
-        [JSON.stringify({
-          tenTaiSan: payload.tenTaiSan as string,
-          soLuong: payload.soLuong,
-          danhMucId: payload.danhMucId as string,
-          moTa: payload.moTa as string,
-          attributes: payload.attributes
-        })],
-        { type: "application/json" }
-      )
-    );
-    images.forEach((img) => {
-      submitData.append("images", img);
+      imageUrls: []
+    }
+    const uploadPromises = images.map(async (img) => {
+      const imgUploadConfig = await fetchImageUploadConfig("products", img.name);
+      return await uploadImageToCloudinary(img, imgUploadConfig);
     });
-    const res = await fetch("http://localhost:8080/api/products", {
-      method: "POST",
-      body: submitData,
-      credentials: "include"
-    });
-    if (res.ok) {
-      alert("Sản phẩm đã được tạo thành công!");
-      window.location.href = "/seller-dashboard/products";
+
+    const uploadedUrls = await Promise.all(uploadPromises);
+    newProduct.imageUrls = uploadedUrls.filter((url): url is string => !!url);
+
+    if (newProduct.imageUrls.length === 0 && images.length > 0) {
+      alert("Không thể upload ảnh. Vui lòng thử lại!");
+      return;
+    }
+
+    const res = await createProduct(newProduct);
+    if (res) {
+      alert("Chúc mừng! Sản phẩm đã được tạo thành công.");
+      window.location.replace("/seller-dashboard/products");
     } else {
-      alert("Đã có lỗi xảy ra khi tạo sản phẩm.");
+      throw new Error("Backend trả về lỗi");
     }
   };
 

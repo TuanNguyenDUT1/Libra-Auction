@@ -3,8 +3,9 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AuctionDeleteConfirm } from "@/components/seller/auction/auction_delete_confirm";
-import { Auction } from "@/types/auction_type";
-import { apiRequest } from "@/services/api_request";
+import { Auction } from "@/types/auction/auction";
+import { fetchPublicAuction } from "@/services/fetch_public_auction";
+import { deleteAuction } from "@/services/delete_auction";
 
 export default function DeleteAuctionPage() {
   const params = useParams();
@@ -24,15 +25,16 @@ export default function DeleteAuctionPage() {
 
       try {
         setLoading(true);
+        if (!params.auction_id || Array.isArray(params.auction_id)) {
+          return;
+        }
 
-        const data = await apiRequest<Auction>(
-          `/api/auction-sessions/${auctionId}`
-        );
+        const data = await fetchPublicAuction(params.auction_id);
 
         setAuction(data);
       } catch (error) {
         console.error("Fetch auction error:", error);
-        router.push("/seller-dashboard/auction-sessions");
+        router.push("/seller-dashboard/auctions");
       } finally {
         setLoading(false);
       }
@@ -46,14 +48,13 @@ export default function DeleteAuctionPage() {
   // =========================
   const handleDelete = async () => {
     try {
-      await apiRequest(
-        `/api/auction-sessions/${auctionId}`,
-        {
-          method: "DELETE"
-        }
-      );
+      if (!params.auction_id || Array.isArray(params.auction_id)) {
+        return;
+      }
 
-      router.push("/seller-dashboard/auction-sessions");
+      await deleteAuction(params.auction_id);
+
+      router.push("/seller-dashboard/auctions");
       router.refresh();
     } catch (error) {
       console.error("Delete error:", error);
@@ -84,7 +85,7 @@ export default function DeleteAuctionPage() {
   // RENDER
   // =========================
   return (
-    <div className="min-h-screen bg-[var(--background-color)] flex items-center justify-center p-6">
+    <div className="min-h-screen bg-(--background-color) flex items-center justify-center p-6">
       <AuctionDeleteConfirm
         auction={auction}
         onDelete={handleDelete}

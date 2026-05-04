@@ -3,16 +3,15 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { AuctionEditForm } from "@/components/seller/auction/auction_edit_form";
-import { AuctionFormData } from "@/types/auction_type";
-import { apiRequest } from "@/services/api_request";
-import { mapApiAuctionToForm } from "@/mappers/auction_form_mapper";
-import { ApiAuctionType } from "@/types/api_types";
+import { NewAuction } from "@/types/auction/new-auction";
+import { fetchPublicAuction } from "@/services/fetch_public_auction";
+import { updateAuction } from "@/services/update_auction";
 
 export default function EditAuctionPage() {
     const params = useParams();
     const router = useRouter();
 
-    const [auctionData, setAuctionData] = useState<AuctionFormData | null>(null);
+    const [auctionData, setAuctionData] = useState<NewAuction | null>(null);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -25,15 +24,17 @@ export default function EditAuctionPage() {
             try {
                 setLoading(true);
 
-                const data = await apiRequest<ApiAuctionType>(
-                    `/api/auction-sessions/${params.auction_id}`
-                );
-
-                console.log("Fetched auction detail:", data);
-
-                const mapped: AuctionFormData = mapApiAuctionToForm(data);
-
-                setAuctionData(mapped);
+                const data = await fetchPublicAuction(params.auction_id);
+                const newAuction: NewAuction = {
+                    taiSanId: data.product_id,
+                    buocGiaNhoNhat: data.min_bid_increment,
+                    giaKhoiDiem: data.starting_price,
+                    loaiDauGia: data.auction_type,
+                    thoiGianBatDau: data.start_time,
+                    thoiLuong: data.duration,
+                    tienCoc: 0
+                }
+                setAuctionData(newAuction);
             } catch (e) {
                 console.error("Fetch error:", e);
             } finally {
@@ -58,7 +59,7 @@ export default function EditAuctionPage() {
             {/* BACK BUTTON */}
             <button
                 onClick={() => router.push("/seller-dashboard/auctions")}
-                className="mb-6 text-sm text-gray-600 hover:text-[var(--primary-color)] transition-colors"
+                className="mb-6 text-sm text-gray-600 hover:text-(--primary-color) transition-colors"
             >
                 ← Quay lại danh sách
             </button>
@@ -66,24 +67,25 @@ export default function EditAuctionPage() {
             <AuctionEditForm
                 initialData={auctionData}
                 onSubmit={async (formData) => {
-                    try {
-                        if (!params.auction_id || Array.isArray(params.auction_id)) return;
+                    if (!params.auction_id || Array.isArray(params.auction_id)) {
+                        return;
+                    }
 
-                        console.log("Submitting PUT...");
-
-                        await apiRequest(
-                            `/api/auction-sessions/${params.auction_id}`,
-                            {
-                                method: "PUT",
-                                body: formData
-                            }
-                        );
-
-                        alert("Cập nhật thành công!");
-                        router.push("/seller-dashboard/auctions");
-                    } catch (e) {
-                        console.error("Update error:", e);
-                        alert("Cập nhật thất bại!");
+                    const newAuction: NewAuction = {
+                        taiSanId: formData.taiSanId,
+                        buocGiaNhoNhat: formData.buocGiaNhoNhat,
+                        giaKhoiDiem: formData.giaKhoiDiem,
+                        loaiDauGia: formData.loaiDauGia,
+                        thoiGianBatDau: formData.thoiGianBatDau,
+                        thoiLuong: formData.thoiLuong,
+                        tienCoc: formData.tienCoc
+                    };
+                    const res = await updateAuction(params.auction_id, newAuction);
+                    if (res) {
+                        alert("Chúc mừng! Phiên đấu giá đã được cập nhật thành công.");
+                        window.location.replace("/seller-dashboard/auctions/" + params.auction_id);
+                    } else {
+                        throw new Error("Backend trả về lỗi");
                     }
                 }}
                 isUpdating={true}

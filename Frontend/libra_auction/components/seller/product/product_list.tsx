@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Product } from "@/types/product_type";
+import { Product } from "@/types/product/product";
 import { ProductSearchBar } from "./product_search_bar";
 import { ProductItem } from "./product_item";
 import { useRouter } from "next/navigation";
@@ -31,7 +31,7 @@ export const ProductList = ({ initialData }: ProductListProps) => {
         {filteredProducts.length > 0 ? (
           filteredProducts.map((product) => (
             <ProductItem
-              key={product.id}
+              key={product.product_id}
               product={product}
               onView={(id) => router.push(`/seller-dashboard/products/${id}`)}
               onEdit={(id) => router.push(`/seller-dashboard/products/${id}/edit`)}

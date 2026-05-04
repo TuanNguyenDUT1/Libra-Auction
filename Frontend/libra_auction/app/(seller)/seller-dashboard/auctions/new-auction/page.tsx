@@ -1,4 +1,4 @@
-import AuctionForm from "@/components/seller/auctionForm";
+import AuctionForm from "@/components/seller/auction/auctionForm";
 import { fetchProducts } from "@/services/fetch_products";
 
 export default async function page() {

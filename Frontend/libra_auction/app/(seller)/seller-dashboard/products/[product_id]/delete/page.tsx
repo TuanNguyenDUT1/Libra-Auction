@@ -1,45 +1,38 @@
 "use client";
 import { useEffect, useState } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams } from "next/navigation";
 import ProductDeleteConfirm from "@/components/seller/product_delete_confirm";
-import { Product } from "@/types/product_type";
-import { apiRequest } from "@/services/api_request";
+import { Product } from "@/types/product/product";
+import { fetchPublicProduct } from "@/services/fetch_public_product";
+import { deleteProduct } from "@/services/delete_product";
 
 export default function DeleteProductPage() {
   const params = useParams();
-  const router = useRouter();
 
   const [product, setProduct] = useState<Product | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  // 1. Fetch product thật
+  // 1. Fetch product
   useEffect(() => {
-    const fetchProduct = async () => {
+    const loadProduct = async () => {
       if (!params.product_id || Array.isArray(params.product_id)) {
         setIsLoading(false);
         return;
       }
 
       try {
-        console.log("Fetching product:", params.product_id);
-
-        const data = await apiRequest<Product>(
-          `/api/products/${params.product_id}`
-        );
-
-        console.log("Fetched product:", data);
-
+        const data = await fetchPublicProduct(params.product_id);
         setProduct(data);
       } catch (err) {
         console.error("Lỗi fetch tài sản:", err);
-        router.push("/seller-dashboard/products/");
+        window.location.replace("/seller-dashboard/products");
       } finally {
         setIsLoading(false);
       }
     };
 
-    fetchProduct();
-  }, [params.product_id, router]);
+    loadProduct();
+  }, [params.product_id]);
 
   // 2. Xử lý DELETE
   const handleDelete = async () => {
@@ -48,18 +41,11 @@ export default function DeleteProductPage() {
     try {
       console.log("Deleting product:", params.product_id);
 
-      await apiRequest(
-        `/api/products/${params.product_id}`,
-        {
-          method: "DELETE",
-        }
-      );
+      await deleteProduct(params.product_id);
 
       alert("Xóa thành công!");
 
-      // redirect sau khi xóa
-      router.push("/seller-dashboard/products/");
-      router.refresh();
+      window.location.replace("/seller-dashboard/products")
     } catch (err) {
       console.error("Lỗi API xóa:", err);
       alert("Xóa tài sản thất bại!");
@@ -85,7 +71,9 @@ export default function DeleteProductPage() {
       <ProductDeleteConfirm
         product={product}
         onDelete={handleDelete}
-        onCancel={() => router.back()}
+        onCancel={() => {
+          window.location.replace("/seller-dashboard/products");
+        }}
       />
     </div>
   );

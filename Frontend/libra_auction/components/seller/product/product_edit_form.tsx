@@ -1,36 +1,36 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
-import { ProductDetailData } from "@/types/product_type";
-import { AttributeType } from "@/types/attribute_type";
+import { Product } from "@/types/product/product";
+import { Attribute } from "@/types/product/attribute";
 import Image from "next/image";
-import { CategoryCardType } from "@/types/category_card_type";
-import { FetchCategories } from "@/services/fetch_categories";
+import { Category } from "@/types/category";
+import { fetchCategories } from "@/services/fetch_categories";
+import { updateProduct } from "@/services/update_product";
+import { NewProduct } from "@/types/product/new-product";
+import { fetchImageUploadConfig } from "@/services/fetch_image_upload_config";
+import { uploadImageToCloudinary } from "@/services/image_upload_to_cloudinary";
 
-interface ProductEditFormProps {
-  initialData: ProductDetailData;
-  onSubmit: (formData: FormData) => Promise<void>;
-}
-
-export default function ProductEditForm({ initialData, onSubmit }: ProductEditFormProps) {
+export default function ProductEditForm({ initialData }: { initialData: Product }) {
   // --- State quản lý dữ liệu ---
-  const [attributes, setAttributes] = useState<AttributeType[]>(initialData.attributes || []);
+  const [attributes, setAttributes] = useState<Attribute[]>(initialData.attributes || []);
   const [existingImages, setExistingImages] = useState<string[]>(initialData.images || []);
   const [newImageFiles, setNewImageFiles] = useState<File[]>([]);
   const [newPreviews, setNewPreviews] = useState<string[]>([]);
-  const [categories, setCategories] = useState<CategoryCardType[]>([]);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [selectedCategory, setSelectedCategory] = useState(initialData.category_id || "");
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
-    const fetchCategories = async () => {
+    const loadCategories = async () => {
       try {
-        const data = await FetchCategories();
+        const data: Category[] = await fetchCategories();
         setCategories(data);
       } catch (e) {
         console.error("Fetch categories error:", e);
       }
     };
 
-    fetchCategories();
+    loadCategories();
   }, []);
 
   // --- Logic Thuộc tính ---
@@ -38,7 +38,7 @@ export default function ProductEditForm({ initialData, onSubmit }: ProductEditFo
     setAttributes([...attributes, { key: "", value: "", isSystem }]);
   };
 
-  const updateAttribute = <K extends keyof AttributeType>(index: number, field: K, val: AttributeType[K]) => {
+  const updateAttribute = <K extends keyof Attribute>(index: number, field: K, val: Attribute[K]) => {
     const newAttrs = [...attributes];
     newAttrs[index] = { ...newAttrs[index], [field]: val };
     setAttributes(newAttrs);
@@ -68,41 +68,41 @@ export default function ProductEditForm({ initialData, onSubmit }: ProductEditFo
     setNewPreviews((prev) => prev.filter((_, i) => i !== index));
   };
 
-  const handleInternalSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: React.ComponentProps<"form">["onSubmit"] = async (e) => {
     e.preventDefault();
-
-    const form = e.currentTarget;
-    const rawFormData = new FormData(form);
-    const payload = {
-      tenTaiSan: rawFormData.get("tenTaiSan"),
-      soLuong: Number(rawFormData.get("soLuong")),
-      danhMucId: rawFormData.get("danhMucId"),
-      moTa: rawFormData.get("moTa"),
+    const formData = new FormData(e.currentTarget);
+    const newProduct: NewProduct = {
+      tenTaiSan: formData.get("tenTaiSan") as string,
+      soLuong: Number(formData.get("soLuong")),
+      danhMucId: formData.get("danhMucId") as string,
+      moTa: formData.get("moTa") as string,
       attributes: attributes,
-      existingImages: existingImages,
-    };
-
-    console.log("Payload:", payload);
-
-    const submitData = new FormData();
-
-    submitData.append(
-      "data",
-      new Blob(
-        [JSON.stringify(payload)],
-        { type: "application/json" }
-      )
-    );
-
-    newImageFiles.forEach((file) => {
-      submitData.append("images", file);
+      imageUrls: []
+    }
+    const uploadPromises = newImageFiles.map(async (img) => {
+      const imgUploadConfig = await fetchImageUploadConfig("products", img.name);
+      return await uploadImageToCloudinary(img, imgUploadConfig);
     });
 
-    await onSubmit(submitData);
+    const uploadedUrls = await Promise.all(uploadPromises);
+    newProduct.imageUrls = existingImages.filter((url): url is string => !!url).concat(uploadedUrls.filter((url): url is string => !!url));
+
+    if (newProduct.imageUrls.length === 0 && newImageFiles.length + existingImages.length > 0) {
+      alert("Không thể upload ảnh. Vui lòng thử lại!");
+      return;
+    }
+
+    const res = await updateProduct(initialData.product_id, newProduct);
+    if (res) {
+      alert("Chúc mừng! Sản phẩm đã được cập nhật thành công.");
+      window.location.replace("/seller-dashboard/products/" + initialData.product_id);
+    } else {
+      throw new Error("Backend trả về lỗi");
+    }
   };
   return (
     <form
-      onSubmit={handleInternalSubmit}
+      onSubmit={handleSubmit}
       className="bg-white p-8 rounded-2xl border border-[#AFD3E2] space-y-8 shadow-sm"
     >
       <header className="border-b border-[#F6F1F1] pb-4">
@@ -136,7 +136,8 @@ export default function ProductEditForm({ initialData, onSubmit }: ProductEditFo
         <label className="text-sm font-bold text-[#146C94]">Danh mục</label>
         <select
           name="danhMucId"
-          defaultValue={initialData.category_id}
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
           required
           className="border border-[#AFD3E2] p-3 rounded-xl focus:ring-2 focus:ring-[#19A7CE]"
         >

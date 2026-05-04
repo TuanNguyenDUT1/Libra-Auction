@@ -1,7 +1,7 @@
 'use client';
 import { useState, useEffect } from 'react';
 import Image from "next/image";
-import { AuctionInfoType } from "@/types/auction_info_type";
+import { Auction } from "@/types/auction/auction";
 import { CurrencyFormat } from '@/utils/currency_format';
 import { TimeFormat } from '@/utils/time_format';
 import { DurationFormat } from '@/utils/duration_format';
@@ -14,10 +14,10 @@ import hourGlass from '@/public/hourglass.png';
 import clock from '@/public/clock.png';
 import typeIcon from '@/public/type.png';
 
-export default function UpcomingAuctionSection({
+export default function AuctionInfoSection({
   autionInfos
 }: {
-  autionInfos: AuctionInfoType
+  autionInfos: Auction
 }) {
   const [activeImage, setActiveImage] = useState(autionInfos.images[0]);
   const [isRegistering, setIsRegistering] = useState(false);
@@ -146,7 +146,7 @@ export default function UpcomingAuctionSection({
                       Start Date
                     </div>
                     <div className="text-2xl font-bold text-gray-900">
-                      {DateFormat(autionInfos.start_time)}
+                      {/* {DateFormat(autionInfos.start_time)} */}
                     </div>
                   </div>
 
@@ -156,7 +156,7 @@ export default function UpcomingAuctionSection({
                       Start Time
                     </div>
                     <div className="text-2xl font-bold text-gray-900">
-                      {TimeFormat(autionInfos.start_time)}
+                      {/* {TimeFormat(autionInfos.start_time)} */}
                     </div>
                   </div>
 

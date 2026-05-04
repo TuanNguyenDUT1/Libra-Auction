@@ -46,7 +46,7 @@ export default function NewListingsCard({
         <div className="flex pt-1">
           <p className="text-lg">{card.bidders} Bidders</p>
           <div className="flex-1"></div>
-          <a className="mt-auto bg-(--primary-color) text-white px-6 py-2 font-bold hover:bg-(--primary-color)/90 active:bg-(--primary-color)/80" href={`categories/${card.category_id}/auctions/${card.id}`}>
+          <a className="mt-auto bg-(--primary-color) text-white px-6 py-2 font-bold hover:bg-(--primary-color)/90 active:bg-(--primary-color)/80" href={`auctions/${card.category_id}/${card.id}`}>
             Register Now
           </a>
         </div>

@@ -1,12 +1,12 @@
 'use server';
-import { getCert } from "./get_cert";
+import { getJWTPublicKey } from "./get_cert";
 import * as jose from "jose";
 import { getJWTTokenInfo } from "./get_jwt_token_info";
 
 export async function refreshToken() {
     const jwtTokenInfo = await getJWTTokenInfo();
     const alg = 'RS256';
-    const spki = await getCert();
+    const spki = await getJWTPublicKey();
     if (spki && jwtTokenInfo.refresh) {
         const publicKey = await jose.importSPKI(spki, alg);
         try {

@@ -1,14 +1,14 @@
 'use server';
 import * as jose from "jose";
 import { JWSSignatureVerificationFailed, JWTExpired } from "jose/errors";
-import { getCert } from "./get_cert";
+import { getJWTPublicKey } from "./get_cert";
 import { refreshToken } from "./refresh_token";
 import { getJWTTokenInfo } from "./get_jwt_token_info";
 
 export async function isAuthenticated() {
     const jwtTokenInfo = await getJWTTokenInfo();
     const alg = 'RS256';
-    const spki = await getCert();
+    const spki = await getJWTPublicKey();
     if (spki && jwtTokenInfo.token) {
         const publicKey = await jose.importSPKI(spki, alg);
         try {

@@ -1,6 +1,6 @@
 "use client";
 
-import { Auction } from "@/types/auction_type";
+import { Auction } from "@/types/auction/auction";
 import { useState } from "react";
 
 interface AuctionDeleteConfirmProps {

@@ -1,12 +1,12 @@
-import { FetchAuctionCards } from "@/services/fetch_auction_cards";
+import { fetchPublicAuctions } from "@/services/fetch_public_auctions"
 import AuctionCard from "./auction_card";
-import { AuctionFilterSidebar } from "@/components/auction_filter_sidebar";
+import { AuctionFilterSidebar } from "@/components/main/auction/auction_filter_sidebar";
 
 export default async function Auctions() {
-    const cards = await FetchAuctionCards();
+    const cards = await fetchPublicAuctions();
 
     return (
-        <div className="flex min-h-screen bg-[var(--background-color)]">
+        <div className="flex min-h-screen bg-(--background-color)">
             {/* Side bar - Chiếm 1/4 và giữ cố định khi scroll */}
             <aside className="w-1/4 sticky top-0 h-screen border-r border-gray-100 bg-white p-6 hidden md:block">
                 <AuctionFilterSidebar />
@@ -21,7 +21,7 @@ export default async function Auctions() {
                     </div>
                     
                     {/* Sort Dropdown đơn giản */}
-                    <select className="text-sm border border-gray-200 rounded-lg p-2 outline-none focus:ring-1 focus:ring-[var(--primary-color)]">
+                    <select className="bg-white text-sm border border-gray-200 rounded-lg p-2 outline-none focus:ring-1 focus:ring-(--primary-color)">
                         <option>Mới nhất</option>
                         <option>Giá thấp nhất</option>
                         <option>Giá cao nhất</option>

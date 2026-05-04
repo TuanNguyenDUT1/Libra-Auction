@@ -1,14 +1,16 @@
-import { FetchAuctionInfo } from "@/services/fetch_auction_info";
-import BreadCrumb from "@/components/breadcrumb";
+import AuctionInfoDetailsSection from "@/components/main/auction/auction_info_details_section";
+import BreadCrumb from "@/components/main/auction/breadcrumb";
+import { fetchPublicAuction } from "@/services/fetch_public_auction";
+import { Auction } from "@/types/auction/auction";
 import { notFound } from "next/navigation";
-import AuctionInfoSection from "@/components/auction_info_section";
-import AuctionInfoDetailsSection from "@/components/auction_info_details_section";
+import AuctionInfoSection from "@/components/main/auction/auction_info_section";
+
 export default async function page(props: {
   params: Promise<{ category_id: string; auction_id: string }>;
 }) {
   const params = await props.params;
   const id = params.auction_id;
-  const auction_info = FetchAuctionInfo(id);
+  const auction_info: Auction = await fetchPublicAuction(id);
   if (auction_info == null) {
     notFound();
   }
