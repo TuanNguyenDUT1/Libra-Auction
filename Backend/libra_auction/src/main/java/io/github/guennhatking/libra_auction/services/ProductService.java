@@ -171,7 +171,7 @@ public class ProductService {
         if (!userId.equals(product.getNguoiTao().getId())) {
             throw new AccessDeniedException("Bạn không có quyền xóa tài sản này");
         }
-
+        hinhAnhTaiSanRepository.deleteByTaiSanId(id);
         taiSanRepository.delete(product);
     }
 }
