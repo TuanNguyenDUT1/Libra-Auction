@@ -8,7 +8,6 @@ import io.github.guennhatking.libra_auction.viewmodels.request.ImageRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadedResponse;
 
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
