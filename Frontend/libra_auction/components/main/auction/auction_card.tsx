@@ -1,7 +1,10 @@
+'use client';
 import { Auction } from "@/types/auction/auction";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 
 export default function AuctionCard({ auctionCard }: { auctionCard: Auction }) {
+    const router = useRouter();
     // Hàm format tiền tệ
     const formatCurrency = (amount: number) => {
         return new Intl.NumberFormat('vi-VN', {
@@ -81,7 +84,8 @@ export default function AuctionCard({ auctionCard }: { auctionCard: Auction }) {
                         </div>
 
                         {/* Nút bấm */}
-                        <button className="flex-grow bg-[#19A7CE] hover:opacity-90 text-white text-xs font-bold py-2 rounded-lg transition-opacity">
+                        <button className="flex-grow bg-[#19A7CE] hover:opacity-90 text-white text-xs font-bold py-2 rounded-lg transition-opacity"
+                        onClick={() => router.push(`/auctions/${auctionCard.category_id}/${auctionCard.auction_id}`)}>
                             Tham gia ngay
                         </button>
                     </div>
