@@ -3,7 +3,12 @@ package io.github.guennhatking.libra_auction.services;
 import com.cloudinary.Cloudinary;
 import com.cloudinary.Transformation;
 import com.cloudinary.utils.ObjectUtils;
+
+import io.github.guennhatking.libra_auction.viewmodels.request.ImageRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadResponse;
+import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadedResponse;
+
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -18,7 +23,7 @@ public class ImageUploadService {
         this.cloudinary = cloudinary;
     }
 
-    public ImageUploadResponse uploadImage(MultipartFile file, String folder) throws Exception {
+    public ImageUploadedResponse uploadImage(MultipartFile file, String folder) throws Exception {
         validateImage(file);
 
         Map<String, Object> uploadOptions = new LinkedHashMap<>();
@@ -51,7 +56,7 @@ public class ImageUploadService {
                 .transformation(transformation)
                 .imageTag(publicId);
 
-        return new ImageUploadResponse(
+        return new ImageUploadedResponse(
                 publicId,
                 file.getOriginalFilename(),
                 stringValue(uploadResult.get("format")),
@@ -65,7 +70,7 @@ public class ImageUploadService {
                 toStringObjectMap(assetDetails));
     }
 
-    public ImageUploadResponse uploadImageFromUrl(String imageUrl, String folder) throws Exception {
+    public ImageUploadedResponse uploadImageFromUrl(String imageUrl, String folder) throws Exception {
         if (imageUrl == null || imageUrl.isBlank()) {
             throw new IllegalArgumentException("Image URL is required");
         }
@@ -102,9 +107,9 @@ public class ImageUploadService {
                 .transformation(transformation)
                 .imageTag(publicId);
 
-        return new ImageUploadResponse(
+        return new ImageUploadedResponse(
                 publicId,
-                imageUrl, // vì không có file gốc nên dùng URL làm tên tham chiếu
+                imageUrl,
                 stringValue(uploadResult.get("format")),
                 stringValue(uploadResult.get("resource_type")),
                 stringValue(uploadResult.get("secure_url")),
@@ -114,6 +119,44 @@ public class ImageUploadService {
                 transformedUrl,
                 transformedImageTag,
                 toStringObjectMap(assetDetails));
+    }
+
+    public ImageUploadResponse createSignedUploadUrl(ImageRequest request) {
+        // 1. Chuẩn bị timestamp
+        long timestamp = System.currentTimeMillis() / 1000L;
+
+        // 2. Tạo tập hợp các tham số cần ký
+        Map<String, Object> paramsToSign = new LinkedHashMap<>();
+
+        // Xử lý folder
+        String normalizedFolder = null;
+        if (request.folder() != null && !request.folder().isBlank()) {
+            normalizedFolder = normalizeFolder(request.folder());
+            paramsToSign.put("folder", normalizedFolder);
+        }
+
+        // Xử lý public_id (fileName)
+        if (request.fileName() != null && !request.fileName().isBlank()) {
+            paramsToSign.put("public_id", request.fileName());
+        }
+
+        paramsToSign.put("timestamp", timestamp);
+
+        // 3. Tạo chữ ký bảo mật từ API Secret
+        String signature = cloudinary.apiSignRequest(paramsToSign, cloudinary.config.apiSecret);
+
+        // 4. Chuẩn bị URL upload
+        String uploadUrl = cloudinary.cloudinaryApiUrl("upload", ObjectUtils.asMap("resource_type", "image"));
+        
+        // 5. Trả về Response cho Client
+        return new ImageUploadResponse(
+                uploadUrl,
+                request.fileName(), // publicId dự kiến
+                cloudinary.config.apiKey,
+                timestamp,
+                signature,
+                paramsToSign // Gửi kèm các params để Client đóng gói vào FormData
+        );
     }
 
     private void validateImage(MultipartFile file) {

@@ -1,17 +1,18 @@
 package io.github.guennhatking.libra_auction.controllers;
 
 import io.github.guennhatking.libra_auction.services.ImageUploadService;
+import io.github.guennhatking.libra_auction.viewmodels.request.ImageRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadResponse;
-import org.springframework.http.MediaType;
+import io.github.guennhatking.libra_auction.viewmodels.response.ServerAPIResponse;
+
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
-@RequestMapping("/images")
+@RequestMapping("/api/public/images")
 public class ImageUploadController {
     private final ImageUploadService imageUploadService;
 
@@ -19,12 +20,9 @@ public class ImageUploadController {
         this.imageUploadService = imageUploadService;
     }
 
-    @PostMapping(value = "/upload", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<ImageUploadResponse> uploadImage(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam(value = "folder", required = false) String folder
-    ) throws Exception {
-        ImageUploadResponse response = imageUploadService.uploadImage(file, folder);
-        return ResponseEntity.ok(response);
+    @PostMapping("/generate-upload-url")
+    public ResponseEntity<ServerAPIResponse<ImageUploadResponse>> getUploadUrl(@RequestBody ImageRequest request) {
+        ImageUploadResponse response = imageUploadService.createSignedUploadUrl(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
     }
 }

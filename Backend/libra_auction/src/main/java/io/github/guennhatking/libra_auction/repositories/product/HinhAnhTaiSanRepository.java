@@ -8,4 +8,6 @@ import java.util.List;
 
 public interface HinhAnhTaiSanRepository extends JpaRepository<HinhAnhTaiSan, String> {
 	List<HinhAnhTaiSan> findByTaiSanIdOrderByThuTuHienThiAsc(String taiSanId);
+
+	void deleteByTaiSanId(String taiSanId);
 }
