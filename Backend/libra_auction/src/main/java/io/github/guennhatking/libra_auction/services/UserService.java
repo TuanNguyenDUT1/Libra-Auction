@@ -10,7 +10,7 @@ import io.github.guennhatking.libra_auction.repositories.account.RoleRepository;
 import io.github.guennhatking.libra_auction.repositories.account.TaiKhoanOAuthRepository;
 import io.github.guennhatking.libra_auction.repositories.account.TaiKhoanPasswordRepository;
 import io.github.guennhatking.libra_auction.repositories.person.NguoiDungRepository;
-import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadResponse;
+import io.github.guennhatking.libra_auction.viewmodels.response.ImageUploadedResponse;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -87,7 +87,7 @@ public class UserService {
 
         NguoiDung user = new NguoiDung(displayName, email);
         try {
-            ImageUploadResponse newUrl = imageUploadService.uploadImageFromUrl(pictureUrl, "avatars");
+            ImageUploadedResponse newUrl = imageUploadService.uploadImageFromUrl(pictureUrl, "avatars");
             user.setAnhDaiDien(newUrl.secureUrl());
         } catch (Exception e) {
             System.out.println("Failed to upload avatar for user " + email + ": " + e.getMessage());
