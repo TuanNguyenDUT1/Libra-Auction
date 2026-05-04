@@ -3,6 +3,7 @@ package io.github.guennhatking.libra_auction.viewmodels.request;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
+import jakarta.validation.constraints.PositiveOrZero;
 
 import java.time.OffsetDateTime;
 
@@ -15,7 +16,7 @@ public record AuctionCreateRequest(
 
         @NotNull(message = "thoiLuong is required") @Positive(message = "thoiLuong must be greater than 0") Long thoiLuong,
         
-        @NotNull(message = "tienCoc is required") @Positive(message = "tienCoc must be greater than 0") Long tienCoc,
+        @NotNull(message = "tienCoc is required") @PositiveOrZero(message = "tienCoc must be greater than or equal 0") Long tienCoc,
 
         @NotNull(message = "giaKhoiDiem is required") @Positive(message = "giaKhoiDiem must be greater than 0") Long giaKhoiDiem,
 

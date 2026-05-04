@@ -3,12 +3,14 @@ package io.github.guennhatking.libra_auction.viewmodels.response;
 import java.time.OffsetDateTime;
 import java.util.List;
 
+import io.github.guennhatking.libra_auction.enums.auction.TrangThaiPhien;
+
 public record AuctionResponse(
         String category_id,
         String category_name,
         String auction_id,
         String auction_name,
-        String auction_status,
+        TrangThaiPhien auction_status,
         String auction_type,
         OffsetDateTime start_time,
         Long duration,
