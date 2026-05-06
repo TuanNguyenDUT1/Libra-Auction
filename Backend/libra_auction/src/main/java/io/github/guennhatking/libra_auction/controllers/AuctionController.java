@@ -56,7 +56,7 @@ public class AuctionController {
 
         AuctionSearchRequest criteria = buildSearchCriteria(
                 name, categoryId, priceFrom, priceTo, startingPrice,
-                timeStart, timeEnd, status,
+                timeStart, timeEnd, status, null,
                 page, pageSize, sortBy, sortOrder);
 
         PageResponse<AuctionResponse> result = searchService.searchAuctions(criteria);
@@ -80,7 +80,7 @@ public class AuctionController {
 
         AuctionSearchRequest criteria = buildSearchCriteria(
                 name, null, priceFrom, priceTo, startingPrice,
-                timeStart, timeEnd, status,
+                timeStart, timeEnd, status, null,
                 page, pageSize, sortBy, sortOrder);
 
         PageResponse<AuctionResponse> result = searchService.searchAuctions(criteria);
@@ -110,7 +110,7 @@ public class AuctionController {
         // Build base criteria (same as public search)
         AuctionSearchRequest baseCriteria = buildSearchCriteria(
                 name, null, priceFrom, priceTo, startingPrice,
-                timeStart, timeEnd, status,
+                timeStart, timeEnd, status, null,
                 page, pageSize, sortBy, sortOrder);
 
         // Ensure authentication succeeded
@@ -190,16 +190,108 @@ public class AuctionController {
         return ResponseEntity.ok(ServerAPIResponse.success(null));
     }
 
+    // ========== ADMIN APPROVAL ENDPOINTS ==========
+
+    @PostMapping("/admin/auctions/{id}/approve")
+    public ResponseEntity<ServerAPIResponse<AuctionResponse>> approveAuction(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        AuctionResponse response = auctionService.approveAuction(id, userDetails.getUserId());
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @PostMapping("/admin/auctions/{id}/reject")
+    public ResponseEntity<ServerAPIResponse<AuctionResponse>> rejectAuction(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id,
+            @RequestBody(required = false) java.util.Map<String, String> request) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        String reason = request != null ? request.get("reason") : null;
+        AuctionResponse response = auctionService.rejectAuction(id, userDetails.getUserId(), reason);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/auctions/pending")
+    public ResponseEntity<ServerAPIResponse<PageResponse<AuctionResponse>>> getPendingAuctions(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        AuctionSearchRequest request = buildSearchCriteria(
+                null, null, null, null, null,
+                null, null, null, "CHUA_DUYET",
+                page, pageSize, "thoiGianBatDau", "DESC");
+
+        PageResponse<AuctionResponse> response = searchService.searchAuctions(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/auctions/approved")
+    public ResponseEntity<ServerAPIResponse<PageResponse<AuctionResponse>>> getApprovedAuctions(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        AuctionSearchRequest request = buildSearchCriteria(
+                null, null, null, null, null,
+                null, null, null, "DA_DUYET",
+                page, pageSize, "thoiGianBatDau", "DESC");
+
+        PageResponse<AuctionResponse> response = searchService.searchAuctions(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/auctions/rejected")
+    public ResponseEntity<ServerAPIResponse<PageResponse<AuctionResponse>>> getRejectedAuctions(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        AuctionSearchRequest request = buildSearchCriteria(
+                null, null, null, null, null,
+                null, null, null, "BI_TU_CHOI",
+                page, pageSize, "thoiGianBatDau", "DESC");
+
+        PageResponse<AuctionResponse> response = searchService.searchAuctions(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
     private AuctionSearchRequest buildSearchCriteria(
             String name, String categoryId, Long priceFrom, Long priceTo, Long startingPrice,
-            String timeStart, String timeEnd, String status,
+            String timeStart, String timeEnd, String status, String trangThaiKiemDuyet,
             Integer page, Integer pageSize, String sortBy, String sortOrder) {
 
         // Logic parse thời gian
         OffsetDateTime parsedStart = ParseDateTime.parse(timeStart);
         OffsetDateTime parsedEnd = ParseDateTime.parse(timeEnd);
 
-        // Gọi constructor của Record (PHẢI ĐỦ 13 THAM SỐ theo định nghĩa Record)
+        // Gọi constructor của Record (15 THAM SỐ theo định nghĩa Record mới)
         return new AuctionSearchRequest(
                 name,
                 categoryId,
@@ -210,9 +302,11 @@ public class AuctionController {
                 parsedEnd,
                 null,
                 status,
+                trangThaiKiemDuyet,
                 page,
                 pageSize,
                 sortBy,
-                sortOrder);
+                sortOrder,
+                null);
     }
 }

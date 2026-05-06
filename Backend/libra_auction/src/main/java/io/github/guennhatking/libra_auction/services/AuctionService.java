@@ -136,4 +136,28 @@ public class AuctionService {
 
                 phienDauGiaRepository.delete(session);
         }
+
+        // ========== ADMIN APPROVAL METHODS ==========
+
+        @Transactional
+        public AuctionResponse approveAuction(String id, String adminId) {
+                PhienDauGia session = phienDauGiaRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException("Auction session not found"));
+
+                session.setTrangThaiKiemDuyet(TrangThaiKiemDuyet.DA_DUYET);
+                PhienDauGia saved = phienDauGiaRepository.save(session);
+
+                return auctionMapper.toAuctionResponse(saved);
+        }
+
+        @Transactional
+        public AuctionResponse rejectAuction(String id, String adminId, String reason) {
+                PhienDauGia session = phienDauGiaRepository.findById(id)
+                                .orElseThrow(() -> new IllegalArgumentException("Auction session not found"));
+
+                session.setTrangThaiKiemDuyet(TrangThaiKiemDuyet.BI_TU_CHOI);
+                PhienDauGia saved = phienDauGiaRepository.save(session);
+
+                return auctionMapper.toAuctionResponse(saved);
+        }
 }

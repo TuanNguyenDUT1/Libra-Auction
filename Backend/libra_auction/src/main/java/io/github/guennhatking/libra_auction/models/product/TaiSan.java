@@ -2,6 +2,8 @@ package io.github.guennhatking.libra_auction.models.product;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -10,6 +12,7 @@ import jakarta.persistence.OneToOne;
 import jakarta.persistence.OneToMany;
 import java.util.List;
 
+import io.github.guennhatking.libra_auction.enums.auction.TrangThaiKiemDuyet;
 import io.github.guennhatking.libra_auction.models.auction.ThongTinPhienDauGia;
 import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 
@@ -51,6 +54,9 @@ public class TaiSan {
     @Column(columnDefinition = "TEXT")
     private String moTa;
 
+    @Enumerated(EnumType.STRING)
+    private TrangThaiKiemDuyet trangThaiKiemDuyet;
+
     // CONSTRUCTOR
     public TaiSan() {
     }
@@ -91,6 +97,10 @@ public class TaiSan {
         return moTa;
     }
 
+    public TrangThaiKiemDuyet getTrangThaiKiemDuyet() {
+        return trangThaiKiemDuyet;
+    }
+
     public List<HinhAnhTaiSan> getHinhAnhTaiSanList() {
         return hinhAnhTaiSanList;
     }
@@ -126,6 +136,10 @@ public class TaiSan {
 
     public void setMoTa(String moTa) {
         this.moTa = moTa;
+    }
+
+    public void setTrangThaiKiemDuyet(TrangThaiKiemDuyet trangThaiKiemDuyet) {
+        this.trangThaiKiemDuyet = trangThaiKiemDuyet;
     }
 
     public void setHinhAnhTaiSanList(List<HinhAnhTaiSan> hinhAnhTaiSanList) {

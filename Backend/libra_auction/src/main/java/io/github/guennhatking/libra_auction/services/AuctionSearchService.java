@@ -6,6 +6,7 @@ import io.github.guennhatking.libra_auction.repositories.auction.PhienDauGiaRepo
 import io.github.guennhatking.libra_auction.viewmodels.request.AuctionSearchRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.AuctionResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.PageResponse;
+import io.github.guennhatking.libra_auction.enums.auction.TrangThaiKiemDuyet;
 import org.springframework.stereotype.Service;
 
 import java.time.OffsetDateTime;
@@ -58,6 +59,8 @@ public class AuctionSearchService {
                 .filter(session -> filterByStartingPrice(session, criteria.startingPrice()))
                 .filter(session -> filterByTimeRange(session, criteria.timeStart(), criteria.timeEnd()))
                 .filter(session -> filterByStatus(session, criteria.status()))
+                .filter(session -> filterByApprovalStatus(session, criteria.trangThaiKiemDuyet()))
+                .filter(session -> filterByProductApprovalStatus(session, criteria.trangThaiKiemDuyet()))
                 .filter(session -> filterByAttributes(session, criteria.attributes()))
                 .filter(session -> filterByOwner(session, criteria.chuSoHuuId()))
                 .collect(Collectors.toList());
@@ -165,6 +168,34 @@ public class AuctionSearchService {
             return false;
         }
         return ownerId.equals(session.getNguoiTao().getId());
+    }
+
+    private boolean filterByApprovalStatus(PhienDauGia session, String trangThaiKiemDuyet) {
+        // If no approval status filter specified, only show approved auctions by default (for public)
+        if (trangThaiKiemDuyet == null || trangThaiKiemDuyet.isBlank()) {
+            return session.getTrangThaiKiemDuyet() != null && 
+                   session.getTrangThaiKiemDuyet().equals(TrangThaiKiemDuyet.DA_DUYET);
+        }
+        // Filter by specific approval status
+        if (session.getTrangThaiKiemDuyet() == null) {
+            return false;
+        }
+        return session.getTrangThaiKiemDuyet().toString().equals(trangThaiKiemDuyet);
+    }
+
+    private boolean filterByProductApprovalStatus(PhienDauGia session, String trangThaiKiemDuyet) {
+        // When viewing public auctions (no approval filter), product must also be approved
+        // When admin filters by specific approval status, don't check product (admin can see all)
+        if (trangThaiKiemDuyet == null || trangThaiKiemDuyet.isBlank()) {
+            if (session.getTaiSan() == null) {
+                return false;
+            }
+            // Product must be approved for public viewing
+            return session.getTaiSan().getTrangThaiKiemDuyet() != null &&
+                   session.getTaiSan().getTrangThaiKiemDuyet().equals(TrangThaiKiemDuyet.DA_DUYET);
+        }
+        // Admin viewing filtered auctions - no product approval check needed
+        return true;
     }
 
     private List<PhienDauGia> applySort(List<PhienDauGia> sessions, AuctionSearchRequest criteria) {

@@ -21,7 +21,10 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api")
@@ -112,5 +115,91 @@ public class ProductController {
         productService.deleteProduct(id, userId);
 
         return ResponseEntity.ok(ServerAPIResponse.success(null));
+    }
+
+    // ========== ADMIN APPROVAL ENDPOINTS ==========
+
+    @PostMapping("/admin/products/{id}/approve")
+    public ResponseEntity<ServerAPIResponse<ProductResponse>> approveProduct(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        ProductResponse response = productService.approveProduct(id, userDetails.getUserId());
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @PostMapping("/admin/products/{id}/reject")
+    public ResponseEntity<ServerAPIResponse<ProductResponse>> rejectProduct(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @PathVariable String id,
+            @RequestBody(required = false) Map<String, String> request) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        String reason = request != null ? request.get("reason") : null;
+        ProductResponse response = productService.rejectProduct(id, userDetails.getUserId(), reason);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/products/pending")
+    public ResponseEntity<ServerAPIResponse<PageResponse<ProductResponse>>> getPendingProducts(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        ProductSearchRequest request = new ProductSearchRequest(
+                null, null, null, page, pageSize, null, null, null, "CHUA_DUYET");
+        
+        PageResponse<ProductResponse> response = productSearchService.searchProducts(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/products/approved")
+    public ResponseEntity<ServerAPIResponse<PageResponse<ProductResponse>>> getApprovedProducts(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        ProductSearchRequest request = new ProductSearchRequest(
+                null, null, null, page, pageSize, null, null, null, "DA_DUYET");
+        
+        PageResponse<ProductResponse> response = productSearchService.searchProducts(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
+    }
+
+    @GetMapping("/admin/products/rejected")
+    public ResponseEntity<ServerAPIResponse<PageResponse<ProductResponse>>> getRejectedProducts(
+            @AuthenticationPrincipal JwtUserDetails userDetails,
+            @RequestParam(defaultValue = "0") Integer page,
+            @RequestParam(defaultValue = "20") Integer pageSize) {
+
+        if (userDetails == null) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                    .body(ServerAPIResponse.error("Authentication required"));
+        }
+
+        ProductSearchRequest request = new ProductSearchRequest(
+                null, null, null, page, pageSize, null, null, null, "BI_TU_CHOI");
+        
+        PageResponse<ProductResponse> response = productSearchService.searchProducts(request);
+        return ResponseEntity.ok(ServerAPIResponse.success(response));
     }
 }

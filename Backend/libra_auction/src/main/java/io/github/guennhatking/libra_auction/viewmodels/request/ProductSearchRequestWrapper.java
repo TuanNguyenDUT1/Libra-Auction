@@ -16,6 +16,7 @@ public final class ProductSearchRequestWrapper {
                 original.pageSize(),
                 original.sortBy(),
                 original.sortOrder(),
-                creatorId);
+                creatorId,
+                original.trangThaiKiemDuyet());
     }
 }

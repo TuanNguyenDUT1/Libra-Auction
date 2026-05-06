@@ -12,6 +12,7 @@ public record AuctionResponse(
         String auction_name,
         TrangThaiPhien auction_status,
         String auction_type,
+        String approval_status,
         OffsetDateTime start_time,
         Long duration,
 

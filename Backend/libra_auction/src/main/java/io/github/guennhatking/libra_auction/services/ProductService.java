@@ -7,6 +7,7 @@ import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import io.github.guennhatking.libra_auction.enums.auction.TrangThaiKiemDuyet;
 import io.github.guennhatking.libra_auction.mappers.ProductResponseMapper;
 import io.github.guennhatking.libra_auction.models.person.NguoiDung;
 import io.github.guennhatking.libra_auction.models.product.DanhMuc;
@@ -78,6 +79,7 @@ public class ProductService {
                 category);
 
         product.setNguoiTao(nguoiTao);
+        product.setTrangThaiKiemDuyet(TrangThaiKiemDuyet.CHUA_DUYET);
         TaiSan savedProduct = taiSanRepository.save(product);
 
         // 1. Lưu Attributes
@@ -173,5 +175,29 @@ public class ProductService {
         }
         hinhAnhTaiSanRepository.deleteByTaiSanId(id);
         taiSanRepository.delete(product);
+    }
+
+    // ========== ADMIN APPROVAL METHODS ==========
+
+    @Transactional
+    public ProductResponse approveProduct(String id, String adminId) {
+        TaiSan product = taiSanRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        product.setTrangThaiKiemDuyet(TrangThaiKiemDuyet.DA_DUYET);
+        TaiSan saved = taiSanRepository.save(product);
+
+        return productResponseMapper.toProductResponse(saved);
+    }
+
+    @Transactional
+    public ProductResponse rejectProduct(String id, String adminId, String reason) {
+        TaiSan product = taiSanRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Product not found"));
+
+        product.setTrangThaiKiemDuyet(TrangThaiKiemDuyet.BI_TU_CHOI);
+        TaiSan saved = taiSanRepository.save(product);
+
+        return productResponseMapper.toProductResponse(saved);
     }
 }

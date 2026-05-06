@@ -6,6 +6,7 @@ import io.github.guennhatking.libra_auction.repositories.product.TaiSanRepositor
 import io.github.guennhatking.libra_auction.viewmodels.request.ProductSearchRequest;
 import io.github.guennhatking.libra_auction.viewmodels.response.PageResponse;
 import io.github.guennhatking.libra_auction.viewmodels.response.ProductResponse;
+import io.github.guennhatking.libra_auction.enums.auction.TrangThaiKiemDuyet;
 import org.springframework.stereotype.Service;
 
 import java.util.Comparator;
@@ -43,6 +44,7 @@ public class ProductSearchService {
                 .filter(product -> filterByCategory(product, criteria.categoryId()))
                 .filter(product -> filterByAttributes(product, criteria.attributes()))
                 .filter(product -> filterByCreator(product, criteria.nguoiTaoId()))
+                .filter(product -> filterByApprovalStatus(product, criteria.trangThaiKiemDuyet()))
                 .collect(Collectors.toList());
     }
 
@@ -93,6 +95,18 @@ public class ProductSearchService {
             return false;
         }
         return nguoiTaoId.equals(product.getNguoiTao().getId());
+    }
+
+    private boolean filterByApprovalStatus(TaiSan product, String trangThaiKiemDuyet) {
+        if (trangThaiKiemDuyet == null || trangThaiKiemDuyet.isBlank()) {
+            // If no approval filter is specified, only show approved products by default
+            return product.getTrangThaiKiemDuyet() != null && 
+                   product.getTrangThaiKiemDuyet().equals(TrangThaiKiemDuyet.DA_DUYET);
+        }
+        if (product.getTrangThaiKiemDuyet() == null) {
+            return false;
+        }
+        return product.getTrangThaiKiemDuyet().toString().equals(trangThaiKiemDuyet);
     }
 
     private List<TaiSan> applySort(List<TaiSan> products, ProductSearchRequest criteria) {

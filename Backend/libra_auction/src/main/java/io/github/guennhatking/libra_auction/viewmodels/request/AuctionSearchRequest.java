@@ -23,6 +23,7 @@ public record AuctionSearchRequest(
 
         // Status filters
         String status,
+        String trangThaiKiemDuyet,
 
         // Pagination
         Integer page,
@@ -42,7 +43,7 @@ public record AuctionSearchRequest(
                                String status, Integer page, Integer pageSize,
                                String sortBy, String sortOrder) {
         this(name, categoryId, priceFrom, priceTo, startingPrice,
-                timeStart, timeEnd, attributes, status, page, pageSize,
+                timeStart, timeEnd, attributes, status, null, page, pageSize,
                 sortBy, sortOrder, null);
     }
 }

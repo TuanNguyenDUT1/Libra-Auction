@@ -1,5 +1,6 @@
 package io.github.guennhatking.libra_auction.controllers;
 
+import io.github.guennhatking.libra_auction.enums.auction.LoaiDauGia;
 import io.github.guennhatking.libra_auction.enums.auction.TrangThaiPhien;
 import io.github.guennhatking.libra_auction.models.auction.PhienDauGia;
 import io.github.guennhatking.libra_auction.repositories.auction.PhienDauGiaRepository;
@@ -20,11 +21,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * WebSocket Controller for handling auction bids
- * Supports 4 types of auctions:
+ * Supports ascending auctions:
  * - DAU_GIA_LEN (Ascending Auction)
- * - DAU_GIA_XUONG (Descending/Dutch Auction)
- * - DAU_GIA_KIN (Sealed Bid Auction)
- * - DAU_GIA_NGUOC (Reverse Dutch Auction)
  */
 @Controller
 public class AuctionWebSocketController {
@@ -36,9 +34,6 @@ public class AuctionWebSocketController {
 
     // In-memory storage for bid history per auction
     private static final Map<String, List<BidResponse>> auctionBids = new ConcurrentHashMap<>();
-
-    // Current winner tracking for sealed bid auctions (revealed only at end)
-    private static final Map<String, BidResponse> sealedBidWinners = new ConcurrentHashMap<>();
 
     // Configuration
     private static final int FINAL_MINUTES_WINDOW = 5;
@@ -72,22 +67,11 @@ public class AuctionWebSocketController {
             }
 
             // Route to appropriate handler based on auction type
-            switch (auction.getLoaiDauGia()) {
-                case DAU_GIA_LEN:
-                    handleAscendingAuction(bidMessage, auction);
-                    break;
-                case DAU_GIA_XUONG:
-                    handleDescendingAuction(bidMessage, auction);
-                    break;
-                case DAU_GIA_KIN:
-                    handleSealedBidAuction(bidMessage, auction);
-                    break;
-                case DAU_GIA_NGUOC:
-                    handleReverseAuction(bidMessage, auction);
-                    break;
-                default:
-                    sendErrorNotification(bidMessage.auctionId(),
-                            "Unknown auction type: " + auction.getLoaiDauGia());
+            if (auction.getLoaiDauGia().equals(LoaiDauGia.DAU_GIA_LEN)) {
+                handleAscendingAuction(bidMessage, auction);
+            } else {
+                sendErrorNotification(bidMessage.auctionId(),
+                        "Unknown auction type: " + auction.getLoaiDauGia());
             }
 
             // After processing bid, check if auction should be extended
@@ -135,113 +119,7 @@ public class AuctionWebSocketController {
         broadcastBid(bidMessage.auctionId(), bidResponse);
     }
 
-    /**
-     * DAU_GIA_XUONG (Dutch Auction - Descending)
-     * Rules:
-     * - Starting price is giaKhoiDiem (very high)
-     * - Price decreases automatically over time or manually
-     * - First bidder to accept the current price wins immediately
-     * - Winner gets the item at that price
-     */
-    private void handleDescendingAuction(BidMessage bidMessage, PhienDauGia auction) {
-        // In Dutch auction, any bid accepts the current price
-        if (auction.getGiaHienTai() == 0) {
-            auction.setGiaHienTai(auction.getGiaKhoiDiem());
-        }
 
-        // Bid amount should equal or be close to current price
-        if (bidMessage.bidAmount() < auction.getGiaHienTai()) {
-            sendErrorNotification(bidMessage.auctionId(),
-                    String.format("Bid (%.0f) must be at least current price (%.0f)",
-                            bidMessage.bidAmount(), auction.getGiaHienTai()));
-            return;
-        }
-
-        // Create bid response
-        BidResponse bidResponse = createBidResponse(bidMessage, "WINNER");
-        recordBid(bidMessage.auctionId(), bidResponse);
-
-        // Update auction - mark as sold to first bidder
-        auction.setGiaHienTai(bidMessage.bidAmount());
-        auction.setTrangThaiPhien(TrangThaiPhien.DA_KET_THUC);
-        phienDauGiaRepository.save(auction);
-
-        // Broadcast winner announcement
-        messagingTemplate.convertAndSend(
-                "/topic/auction/" + bidMessage.auctionId(),
-                createWinnerMessage(bidResponse, "Auction won! Item sold at: " + bidMessage.bidAmount()));
-    }
-
-    /**
-     * DAU_GIA_KIN (Sealed Bid Auction)
-     * Rules:
-     * - All bids are kept secret during the auction
-     * - Bidders don't see each other's bids or current price
-     * - Only the winner is revealed after auction ends
-     * - Highest unique bid wins (or second-highest price is paid in some variants)
-     */
-    private void handleSealedBidAuction(BidMessage bidMessage, PhienDauGia auction) {
-        // Validate minimum bid
-        if (bidMessage.bidAmount() < auction.getGiaKhoiDiem()) {
-            sendErrorNotification(bidMessage.auctionId(),
-                    "Bid amount must be at least: " + auction.getGiaKhoiDiem());
-            return;
-        }
-
-        // Create bid response but DON'T show details to others
-        BidResponse bidResponse = createBidResponse(bidMessage, "SEALED");
-        recordBid(bidMessage.auctionId(), bidResponse);
-
-        // Update winner tracking (highest bid so far)
-        updateSealedBidWinner(bidMessage.auctionId(), bidResponse);
-
-        // Send confirmation ONLY to the bidder (not public)
-        messagingTemplate.convertAndSendToUser(
-                bidMessage.bidderId(),
-                "/queue/bid-confirmation/" + bidMessage.auctionId(),
-                createConfirmation(bidMessage, "Your sealed bid has been received and recorded"));
-
-        // Send generic message to all (no bid amounts revealed)
-        messagingTemplate.convertAndSend(
-                "/topic/auction/" + bidMessage.auctionId(),
-                createGenericNotification("A new sealed bid has been registered"));
-    }
-
-    /**
-     * DAU_GIA_NGUOC (Reverse Dutch Auction)
-     * Rules:
-     * - Starting price is low (giaKhoiDiem)
-     * - Price increases over time
-     * - Buyers decide when to accept (similar to regular Dutch but inverted)
-     * - First to accept the current price wins
-     */
-    private void handleReverseAuction(BidMessage bidMessage, PhienDauGia auction) {
-        long currentPrice = auction.getGiaHienTai() > 0
-                ? auction.getGiaHienTai()
-                : auction.getGiaKhoiDiem();
-
-        // Bid must accept or exceed current asking price
-        if (bidMessage.bidAmount() < currentPrice) {
-            sendErrorNotification(bidMessage.auctionId(),
-                    String.format("Bid (%.0f) must be at least asking price (%.0f)",
-                            bidMessage.bidAmount(), currentPrice));
-            return;
-        }
-
-        // Create bid response
-        BidResponse bidResponse = createBidResponse(bidMessage, "WINNER");
-        recordBid(bidMessage.auctionId(), bidResponse);
-
-        // Update auction - mark as sold
-        auction.setGiaHienTai(bidMessage.bidAmount());
-        auction.setTrangThaiPhien(TrangThaiPhien.DA_KET_THUC);
-        phienDauGiaRepository.save(auction);
-
-        // Broadcast winner
-        messagingTemplate.convertAndSend(
-                "/topic/auction/" + bidMessage.auctionId(),
-                createWinnerMessage(bidResponse, "Auction won at: " + bidMessage.bidAmount()));
-    }
 
     /**
      * Helper: Create standard bid response
@@ -272,16 +150,6 @@ public class AuctionWebSocketController {
     }
 
     /**
-     * Helper: Update winner for sealed bid auctions
-     */
-    private void updateSealedBidWinner(String auctionId, BidResponse bidResponse) {
-        BidResponse currentWinner = sealedBidWinners.get(auctionId);
-        if (currentWinner == null || bidResponse.bidAmount() > currentWinner.bidAmount()) {
-            sealedBidWinners.put(auctionId, bidResponse);
-        }
-    }
-
-    /**
      * Helper: Create winner message
      */
     private BidResponse createWinnerMessage(BidResponse bidResponse, String message) {
@@ -292,32 +160,6 @@ public class AuctionWebSocketController {
                 bidResponse.bidderName(),
                 OffsetDateTime.now(ZoneOffset.ofHours(7)),
                 "WINNER");
-    }
-
-    /**
-     * Helper: Create confirmation message for sealed bids
-     */
-    private BidResponse createConfirmation(BidMessage message, String confirmationText) {
-        return new BidResponse(
-                message.auctionId(),
-                message.bidAmount(),
-                message.bidderId(),
-                null, // bidderName không có trong BidMessage, để null hoặc giá trị mặc định
-                OffsetDateTime.now(ZoneOffset.ofHours(7)),
-                "CONFIRMED");
-    }
-
-    /**
-     * Helper: Create generic notification (no sensitive details)
-     */
-    private BidResponse createGenericNotification(String message) {
-        return new BidResponse(
-                null,
-                null,
-                null,
-                null,
-                OffsetDateTime.now(ZoneOffset.ofHours(7)),
-                "NOTIFICATION");
     }
 
     /**
@@ -342,18 +184,10 @@ public class AuctionWebSocketController {
     }
 
     /**
-     * Get sealed bid winner (called when auction ends)
-     */
-    public BidResponse getSealedBidWinner(String auctionId) {
-        return sealedBidWinners.get(auctionId);
-    }
-
-    /**
      * Clear auction data (cleanup after auction ends)
      */
     public void clearAuctionData(String auctionId) {
         auctionBids.remove(auctionId);
-        sealedBidWinners.remove(auctionId);
     }
 
     /**

@@ -18,6 +18,7 @@ public final class AuctionSearchRequestWrapper {
                 original.timeEnd(),
                 original.attributes(),
                 original.status(),
+                original.trangThaiKiemDuyet(),
                 original.page(),
                 original.pageSize(),
                 original.sortBy(),
